@@ -1,2 +1,3 @@
 # masters-project
-Brittany Hall's master project Autumn 2017
+Brittany Hall's Specialization Project Autumn 2017
+
