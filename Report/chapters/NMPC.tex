@@ -1,0 +1,81 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{NMPC Problem Formulations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The NMPC Problem}
+We consider a nonlinear discrete-time dynamic system expressed as \cite{economic}:
+\begin{equation}
+	\boldsymbol{x}_{k+1}=f(\boldsymbol{x}_k,\boldsymbol{u}_k)
+	\label{eq:nonlin}
+\end{equation}
+where $\boldsymbol{x}_k\in\mathbb{R}^{n_x}$ denotes the state variable, $\boldsymbol{u}_k\in\mathbb{R}^{n_u}$ is the control input and $f:\mathbb{R}^{n_x}\times\mathbb{R}^{n_u}\rightarrow \mathbb{R}^{n_x}$ is a continuous model function, which calculates the next state $\boldsymbol{x}_{k+1}$ from the previous state $\boldsymbol{x}_k$ and control input $\boldsymbol{u}_k$, where $k\in\mathbb{N}$.
+This system will be optimized by a nolinear model predictive controller which solves the problem:
+\begin{mini!}|s|[1]
+	{\boldsymbol{z}_l,\boldsymbol{v}_l}{\Psi(\boldsymbol{z}_N+\sum_{l=0}^{N-1}\psi(\boldsymbol{z}_l,\boldsymbol{v}_l)}{}{(\mathcal{P}_{NMPC}):}
+	\addConstraint{\boldsymbol{z}_{l+1}=f(\boldsymbol{z}_l,\boldsymbol{v}_l), \qquad l=0,\ldots,N-1}{}
+	\addConstraint{\boldsymbol{z}_0=\boldsymbol{x}_k}{}
+	\addConstraint{(\boldsymbol{z}_l,\boldsymbol{v}_l)\in\mathcal{Z}}{}
+	\addConstraint{\boldsymbol{z}_N\in\mathcal{X}_f}{}
+\end{mini!}
+at each sample time.
+Here $\boldsymbol{z}_l\in\mathbb{R}^{n_x}$ is the predicted state variable; $\boldsymbol{v}_l\in\mathbb{R}^{n_u}$ is the predicted control input; and $\boldsymbol{z}_n\in\mathcal{X}_f$ is the final predicted state variable restricted to the terminal region $\mathcal{X}_f\in\mathbb{R}^{n_x}$.
+The stage cost is denoted by $\psi:\mathbb{R}^{n_x}\times\mathbb{R}^{n_u}\rightarrow\mathbb{R}$ and the terminal cost by $\Psi:\mathcal{X}_f\rightarrow\mathbb{R}$.
+$\mathcal{Z}$ denotes the path constraints where $\mathcal{Z}=\{(\boldsymbol{z},\boldsymbol{v})|q(\boldsymbol{z},\boldsymbol{v})\leq 0\}$, where $q:\mathbb{R}^{n_x}\times\mathbb{R}^{n_u}\rightarrow\mathbb{R}^{n_q}$.
+The solution to this problem is denoted as $\{\boldsymbol{x}_0^*,\ldots,\boldsymbol{z}_N^*,\boldsymbol{v}_0^*,\ldots,\boldsymbol{v}_{N-1}^*\}$
+\par
+The idea is that at sample time $k$, an estimate or measurement of the state $\boldsymbol{x}_k$ is obtained and the problem $\mathcal{P}_{NMPC}$ is solved,
+The first part of the optimal control sequence is then the plant input such that $\boldsymbol{u}_k=\boldsymbol{v}_0^*$.
+This part of the solution defines an implicit feedback law $\boldsymbol{u}_k=\kappa(\boldsymbol{x}_k)$, and the system evolves according to Equation \ref{eq:nonlin}.
+At the next sample time $k+1$, when the measurement of the new state is obtained, the procedure is repeated.
+Algorithm 1 summarizes the NMPC algorithm.\\
+\begin{algorithm}[H]
+ \caption{General NMPC algorithm.}
+	\SetAlgoLined
+	set $k\leftarrow 0$\\
+	\While{MPC is running}{
+		\begin{enumerate}
+			\item Measure or estimate $x_k$
+			\item Assign the initial state: set $\boldsymbol{z}_0=x_k$
+			\item Solve the optimization problem $\mathcal{P}_{NMPC}$ to find $\boldsymbol{v_0^*}$.
+			\item Assign the plant input $\boldsymbol{u}_k=\boldsymbol{v}_0^*$
+			\item Inject $\boldsymbol{u}_k$ to the plant
+			\item Set $k\leftarrow k+1$
+		\end{enumerate}
+		}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ideal NMPC and Advanced-Step NMPC Framework}
+To achieve optimal economic performance and good stability properties, the problem shown in $\mathcal{P}_{NMPC}$ needs to be solved instantaneously, allowing the optimal input to be injected into the process without time delay.
+This is known as ideal NMPC.
+\par
+In reality, there will always be some time delay between obtaining the updated values of the states and injecting them into the plant.
+The main cause of this delay is the time required to solve the optimization problem $\mathcal{P}_{NMPC}$.
+As the process models grow, so to does the computation time.
+With sufficiently large systems, this computational delay cannot be neglected.
+One approach is the advanced-step NMPC (asNMPC) which is based on the following steps:
+\begin{enumerate}
+	\item Solve the NMPC problem at time $k$ with a predicted state value of $k+1$
+	\item When the measurement $\boldsymbol{x}_{k+1}$ becomes available at time $k+1$, compute an approximation of the NLP solution using fast sensitivity methods
+	\item Update $k\leftarrow k+1$, and repeat from Step 1
+\end{enumerate}
+Different fast sensitivity methods can be used and are discussed further in Section \ref{sec:}.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sensitivity-Based Path-Following NMPC}
+Below we outline sensitivity results and then utilize them in a path-following scheme for obtaining fast approximate solutions to the NLP.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sensitivity Properties of NLP}
+The dynamic optimization problem can be written as a generic NLP problem:
+\begin{mini!}|s|[1]
+	{\mathcal{X}}{F(\mathcal{X},\boldsymbol{p})}{\label{eq:param_NLP}}{(\mathcal{P}_{NLP}):}
+	\addConstraint{c(\mathcal{X},\boldsymbol{p})=0}{}
+	\addConstraint{g(\mathcal{X},\boldsymbol{p})\leq 0}{}
+\end{mini!}
+where $\mathcal{X}\in\mathbb{R}^{n_\mathcal{X}}$ are the decision variables (typically the state variables and the control input) and $\boldsymbol{p}\in\mathbb{R}^{n_p}$ is the parameter (typically the initial state variable).
+$F:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}$  is the scalar objective function, $c:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_c}$ denotes the equality constraints, and $g:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_g}$ denotes the inequality constraints.
+Each instance of the general parameteric NLP shown in Equation \ref{eq:param_NLP} that are solved for each sample time differ only in the parameter $\boldsymbol{p}$.
+(See Suwardti et. al. for the Lagrangian and the Karush-Kuhn-Tucker (KKT) conditions \cite{economic}.)
+\par
+We wish to know how the solution changes with a perturbation in the parameter $\boldsymbol{p}$.
+

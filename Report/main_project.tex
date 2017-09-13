@@ -1,0 +1,68 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+\usepackage{caption,booktabs,array}
+\usepackage{tocbibind}
+\usepackage[toc,page]{appendix}
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[backend=bibtex]{biblatex}
+\usepackage{bm}
+\usepackage[short]{optidef}
+\usepackage[ruled, algochapter, noend, linesnumbered,ruled]{algorithm2e}
+\addbibresource{chapters/references.bib}
+\pagestyle{fancy}
+\fancyhead{}
+%\fancyhead[LE,RO]{\textsl{\rightmark}}
+\fancyhead[LO,RE]{\textsl{\leftmark}}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+%Titlepage
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.5\textwidth]{NTNU}\par\vspace{1cm}
+	%{\scshape\LARGE Norwegian University of Science and Technology \par}
+	\vspace{1cm}
+	{\scshape\Large Masters Specialization Project\par}
+	\vspace{1.5cm}
+	{\huge\bfseries Sensitivity-Based Economic NMPC with a Path-Following Approach in Python\par}
+	\vspace{2cm}
+	{\Large\itshape Brittany Hall\par}
+	\vfill
+	supervised by\par
+	Johannes J{\"a}schke and Eka Suwartadi
+
+	\vfill
+
+	% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+%
+\tableofcontents
+%
+\chapter{Summary}
+%
+\chapter{Introduction}
+\input{chapters/introduction}
+\label{ch:intro}
+
+%
+\chapter{NMPC}
+\input{chapters/NMPC}
+%
+\chapter{Numerical Case Study}
+%
+\chapter{Results}
+%
+\chapter{Discussion}
+%
+\chapter{Conclusion}
+%
+\printbibliography
+
+\end{document}

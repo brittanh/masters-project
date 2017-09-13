@@ -1,0 +1,87 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.7 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\sortlist[entry]{nty/global/}
+  \entry{framework}{article}{}
+    \name{author}{2}{}{%
+      {{hash=LSF}{%
+         family={Lozano\bibnamedelima Santamaria},
+         family_i={L\bibinitperiod\bibinitdelim S\bibinitperiod},
+         given={Federico},
+         given_i={F\bibinitperiod},
+      }}%
+      {{hash=GJ}{%
+         family={Gomez},
+         family_i={G\bibinitperiod},
+         given={Jorge},
+         given_i={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{LSFGJ1}
+    \strng{fullhash}{LSFGJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{L}
+    \field{sortinithash}{L}
+    \field{booktitle}{Computers & Chemical Engineering}
+    \field{title}{Framework in PYOMO for the assessment and implementation of
+  (as)NMPC controllers}
+    \field{volume}{92}
+    \field{month}{05}
+    \field{year}{2016}
+  \endentry
+
+  \entry{economic}{article}{}
+    \name{author}{3}{}{%
+      {{hash=SE}{%
+         family={Suwartadi},
+         family_i={S\bibinitperiod},
+         given={Eka},
+         given_i={E\bibinitperiod},
+      }}%
+      {{hash=KV}{%
+         family={Kungurtsev},
+         family_i={K\bibinitperiod},
+         given={Vyacheslav},
+         given_i={V\bibinitperiod},
+      }}%
+      {{hash=JJ}{%
+         family={J\"{a}scke},
+         family_i={J\bibinitperiod},
+         given={Johannes},
+         given_i={J\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {MDPI AG}%
+    }
+    \strng{namehash}{SEKVJJ1}
+    \strng{fullhash}{SEKVJJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{pages}{8}
+    \field{title}{Sensitivity-Based Economic NMPC with a Path-Following
+  Approach}
+    \field{volume}{5}
+    \field{journaltitle}{Processes}
+    \field{year}{2017}
+  \endentry
+\endsortlist
+\endinput
