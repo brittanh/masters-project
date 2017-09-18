@@ -10,33 +10,28 @@
 
 from casadi import *
 from numpy import array, empty
+from gurobipy import *
+from matplotlib.pyplot as pyplot
+
 #problem to solve
 # min p1x1^3+x2^2
 # st x2-exp(-x1)=>0, x1=> p2
 #want to find approximate solution at p=(8,1)
 
-#Defining Constants
+#Numerical Values
 t = 0
-delta_t = 1e-4
+delta_t = 0.1
 N = 1/delta_t
-alpha1 = 0.66 #0<alpha1<1
+alpha1 = 0.66                                                       #0<alpha1<1
 
-#Approximate solution
-x0 = array([0.5,0.6]) #numerical matrix
+#Initial Conditions
+x0 = array([0.5,0.6])                               #initial guess for solution
 p = empty([1, N])
-p[0] = array([-1, 4]) #initial parameter value
-p[N] = array([8,1]) #final parameter value
+p[0] = array([-1, 4])                                  #initial parameter value
+p[N] = array([8,1])                                      #final parameter value
 
-#initial variables from NLP
-chi = MX.sym('X',2,1) #primal variable
-lamb = MX.sym('lam',1) #dual variable
-mu = MX.sym(',mu',2,1) #dual variable
 
-#Calculate Lagrangian
 
-#Calculate Jacobian of Lagrangian
-
-#Calculate gradient of F
 
 #Path Following Algorithm
 ##Algorithm 2 from 2016_Suwartadi_etal
