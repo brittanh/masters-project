@@ -17,6 +17,34 @@
 \endgroup
 
 \sortlist[entry]{nty/global/}
+  \entry{perturb}{article}{}
+    \name{author}{2}{}{%
+      {{hash=BJF}{%
+         family={Bonnans},
+         family_i={B\bibinitperiod},
+         given={J.\bibnamedelima Fr\`{e}d\`{e}ric},
+         given_i={J\bibinitperiod\bibinitdelim F\bibinitperiod},
+      }}%
+      {{hash=SA}{%
+         family={Shapiro},
+         family_i={S\bibinitperiod},
+         given={Alexander},
+         given_i={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{BJFSA1}
+    \strng{fullhash}{BJFSA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{B}
+    \field{sortinithash}{B}
+    \field{pages}{228\bibrangedash 264}
+    \field{title}{Optimization Problems with Perturbations: A Guided Tour}
+    \field{volume}{40}
+    \field{journaltitle}{SIAM Rev}
+    \field{year}{1998}
+  \endentry
+
   \entry{framework}{article}{}
     \name{author}{2}{}{%
       {{hash=LSF}{%

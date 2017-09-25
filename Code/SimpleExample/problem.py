@@ -4,92 +4,44 @@
     @purpose: Defining the problem to be solved
     @author: Brittany Hall
     @date: 18.09.2017
-    @version: 1
+    @version: 0.1
     @updates:
 """
 
 from casadi import *
-from numpy import array
+from numpy import array, ones, zeros
 
 
 #Defining the problem
 def prob():
     """
-        Information on the problem to be solved
-        """
-    n = 2                                                  #number of variables
+    Information on the problem to be solved
+    """
+    n = 2                                         #number of variables [x1, x2]
+    np = 2                                       #number of parameters [p1, p2]
     neq = 0                                     #number of equality constraints
     niq = 2                                   #number of inequality constraints
+    name = "Problem 1"
+    return n, np, neq, niq, name
 
-def obj(x,y,p):
+def obj(x, y, p, neq, niq, n, np):
     """
-        Problem to be solved and calculation of derivates, Lagrangians,etc
-        """
-    x = SX.sym('x',2)                             #x variable (primal solution)
-    p = SX.sym('p',2)                               #p variable (dual solution)
-    f = p[0]*x[0]**3+x[1]                                   #objective function
-    con = vertcat([exp(-x[0])-x[1],p[1]-x[0]])
+    Problem to be solved
+    """
+    p = SX.sym('p',np)                                              #Parameters
+    x = SX.sym('x',n)                                                 #Variable
+    f = p[0]*x[0]**3+x[1]**2                                   #Objective array
+    f_fun = Function('f_fun',[x,p],[p[0]*x[0]**3+x[1]**2])  #Objective function
     
-    #Constructing the Lagrangian
-    lag = f+ mul((y.T),con)
+    con = vertcat(exp(-x[0])-x[1],p[1]-x[0])                #Constraint array
+    conf = Function('conf',[x,p],[exp(-x[0])-x[1],p[1]-x[0]])#Constraint function
     
-    #Calculating gradient of F
-    opf = {'input':['x','p'],\
-        'output': ['f']}
-    f = SXFunction('f',[x,p],[f],opf) #making the objective function a function
-    g = SXFunction(f.gradient())            #gradient of the objective function
-
-#Calculating derivative of Lagrangian and constraints
-op = {'input':['x','p'],\
-    'output':['lag']}
-    lagr = SXFunction('lagr',[x,p],[lag],op)
-    H = SXFunction(lagr.hessian('x','lag'))                            #Hessian
-    J_lagr_x = SXFunction(lagr.jacobian('x','lag'))     #Jacobian of Lagrangian
-    Lxp = J_lagr_x.jacobian(1,0)
     
-    opc = {'input':['x','p'],\
-        'output':['con']}
-    cst = SXFunction('cst',[x,p],[con],opc)
-    J_cst = cst.jacobian('x','con')
-    cp = cst.jacobian('p','con')
-
-#Defining Input values and evaluating
-f.SetInput(x,'x')
-    f.setInput(p,'p')
-    g.setInput(x,'x')
-    g.setInput(p,'p')
-    H.setInput(x,'x')
-    H.setInput(p,'p')
-    Lxp.setInput(x,'x')
-    Lxp.setInput(p,'p')
-    J_cst.setInput(x,'x')
-    J_cst.setInput(p,'p')
-    cp.setInput(x,'x')
-    cp.setInput(p,'p')
-    cst.setInput(x,'x')
-    cst.setInput(p,'x')
-    
-    f.evaluate()
-    g.evaluate()
-    H.evaluate()
-    Lxp.evaluate()
-    J_cst.evaluate()
-    cp.evaluate()
-    Lxp.evaluate()
-    cst.evaluate()
-    
-    f = array(f.getOutput())
-    g   = array(g.getOutput())
-    H   = array(H.getOutput())
-    Lxp = array(Lxp.getOutput())
-    J_cst   = array(J_cst.getOutput())
-    cp  = array(cp.getOutput())
-    cst = array(cst.getOutput())
-    
-    #Equality Constraints
-    Jeq = array([])
-    dpe = array([])
-    
-    return f,g,H,Lxp,cst,J_cst,cp,Jeq,dpe
+    #Specifying Bounds
+    ubx = 1e16*ones([1,n])                                #Variable upper bound
+    lbx = -1e16*ones([1,n])                               #Variable lower bound
+    ubg = zeros([1,niq+neq])                            #Constraint upper bound
+    lbg= -1e16*ones([1,niq+neq])                         #Constraint lower boun
+    return x, p, f, f_fun, con, conf, ubx, lbx, ubg, lbg
 
 

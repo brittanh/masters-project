@@ -10,8 +10,10 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[backend=bibtex]{biblatex}
+\usepackage{my-notation}
 \usepackage{bm}
 \usepackage[short]{optidef}
+
 \usepackage[ruled, algochapter, noend, linesnumbered,ruled]{algorithm2e}
 \addbibresource{chapters/references.bib}
 \pagestyle{fancy}
@@ -20,6 +22,7 @@
 \fancyhead[LO,RE]{\textsl{\leftmark}}
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
+\usepackage{algorithm2e}
 
 \begin{document}
 %Titlepage
@@ -55,7 +58,8 @@
 \chapter{NMPC}
 \input{chapters/NMPC}
 %
-\chapter{Numerical Case Study}
+\chapter{Simple Example}
+\input{chapters/simple}
 %
 \chapter{Results}
 %

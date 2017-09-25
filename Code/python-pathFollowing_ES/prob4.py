@@ -22,11 +22,11 @@ def objective(x,y,p):
     definition of a problem and its derivatives
     '''
     # construct Lagrangian
-    v = SX.sym('v',2); # x variable resemble
-    t = SX.sym('t',2); # p variable resemble
+    v = SX.sym('v',2)  # x variable resemble
+    t = SX.sym('t',2) # p variable resemble
     f = t[0]*v[0]**3 + v[1]**2
-    c_expr   = vertcat([(exp(-v[0])-v[1]),(t[1]-v[0])])
-    lag_expr = f + mul((y.T),c_expr);
+    c_expr   = vertcat(exp(-v[0])-v[1],t[1]-v[0])
+    lag_expr = f + mul(y.T,c_expr)
     
     # objective function related derivatives
     opf = {'input_scheme': ['v','t'], \
@@ -64,7 +64,7 @@ def objective(x,y,p):
     cp.setInput(p,'t')
     cst.setInput(x,'v')
     cst.setInput(p,'t') 
-    
+
     f.evaluate()
     g.evaluate()
     H.evaluate()

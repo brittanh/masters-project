@@ -67,7 +67,7 @@ def jpredictor(prob, derivatives, p_init, p_final, x_init, y_init, delta_t, lb, 
         
         if (qp_exit == 'optimal'):
             # call LP solver 
-            delta_l, lp_exit = lp_solve(oqp, y_init, step, y, k_zero_tilde, k_plus_tilde, g)
+            delta_l, lp_exit = lp_solve(oqp, y_init, step, y, k_zero_tilde, k_plus_tilde, g) #? 
             
             if (lp_exit == 'optimal'):
                 # update states, multipliers, parameter, and time step

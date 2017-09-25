@@ -6,7 +6,7 @@ Created on 17. nov. 2015
 # -*- coding: utf-8 -*-
 import numpy as np
 #import casadi as cas
-from openopt import QP
+from openopt import QP #don't use this one
 
 def indices(a, func):
     return [i for (i, val) in enumerate(a) if func(val)]

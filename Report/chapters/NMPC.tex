@@ -68,14 +68,100 @@ Below we outline sensitivity results and then utilize them in a path-following s
 \subsection{Sensitivity Properties of NLP}
 The dynamic optimization problem can be written as a generic NLP problem:
 \begin{mini!}|s|[1]
-	{\mathcal{X}}{F(\mathcal{X},\boldsymbol{p})}{\label{eq:param_NLP}}{(\mathcal{P}_{NLP}):}
-	\addConstraint{c(\mathcal{X},\boldsymbol{p})=0}{}
-	\addConstraint{g(\mathcal{X},\boldsymbol{p})\leq 0}{}
+	{\mathcal{X}}{F(\boldsymbol{\chi},\boldsymbol{p})}{\label{eq:param_NLP}}{(\mathcal{P}_{NLP}):}
+	\addConstraint{c(\boldsymbol{\chi},\boldsymbol{p})=0}{}
+	\addConstraint{g(\boldsymbol{\chi},\boldsymbol{p})\leq 0}{}
 \end{mini!}
-where $\mathcal{X}\in\mathbb{R}^{n_\mathcal{X}}$ are the decision variables (typically the state variables and the control input) and $\boldsymbol{p}\in\mathbb{R}^{n_p}$ is the parameter (typically the initial state variable).
-$F:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}$  is the scalar objective function, $c:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_c}$ denotes the equality constraints, and $g:\mathbb{R}^{n_\mathcal{X}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_g}$ denotes the inequality constraints.
+where $\boldsymbol{\chi}\in\mathbb{R}^{n_{\boldsymbol{\chi}}}$ are the decision variables (typically the state variables and the control input) and $\boldsymbol{p}\in\mathbb{R}^{n_p}$ is the parameter (typically the initial state variable).
+$F:\mathbb{R}^{n_{\boldsymbol{\chi}}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}$  is the scalar objective function, $c:\mathbb{R}^{n_{\boldsymbol{\chi}}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_c}$ denotes the equality constraints, and $g:\mathbb{R}^{n_{\boldsymbol{\chi}}}\times \mathbb{R}^{n_p}\rightarrow\mathbb{R}^{n_g}$ denotes the inequality constraints.
 Each instance of the general parameteric NLP shown in Equation \ref{eq:param_NLP} that are solved for each sample time differ only in the parameter $\boldsymbol{p}$.
 (See Suwardti et. al. for the Lagrangian and the Karush-Kuhn-Tucker (KKT) conditions \cite{economic}.)
 \par
-We wish to know how the solution changes with a perturbation in the parameter $\boldsymbol{p}$.
+It has been shown that the perturbed NLP can be solved by solving a QP problem of the form \cite{perturb}:
+\begin{mini!}
+	{\Delta\boldsymbol{\chi}}{\frac{1}{2}\boldsymbol{\chi}^T\nabla_{\boldsymbol{\chi}\boldsymbol{\chi}}^2\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\Delta\boldsymbol{\chi}+\Delta\boldsymbol{\chi}^T\nabla_{\boldsymbol{p}\boldsymbol{\chi}}^2\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\Delta \boldsymbol{p}}{}{\label{eq:QP}}
+	\addConstraint{\nabla_{\boldsymbol{\chi}} c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{\chi}+\nabla_{\boldsymbol{p}}c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{p}=0\qquad}{i=1,\ldots,n_c}
+	\addConstraint{\nabla_{\boldsymbol{\chi}} g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{\chi}+\nabla_{\boldsymbol{p}}g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{p}=0\qquad}{j\in K_+}
+	\addConstraint{\nabla_{\boldsymbol{\chi}} c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{\chi}+\nabla_{\boldsymbol{p}}c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0)^T\Delta\boldsymbol{p}\leq 0\qquad}{j\in K_0}
+\end{mini!}
+where $K_+=\{j\in\mathbb{Z}:\mu_j>0\}$ is the strongly-active set and $K_0=\{j\in\mathbb{Z}:\mu_j=0 \text{ and } g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0)=0\}$ denotes the weakly active set.
+Note that the solution to this QP is the directional derivative of the primal-dual solution of the NLP, it is a predictor step; thus we refer to (\ref{eq:QP}) as a pure-predictor.
+\par
+It is important to recognize that the QP is only able to produce the optimal solution accurately for small perturbations and cannot be guaranteed to work for larger perturbations.
+One way of handling cases like this to divide the perturbation into several smaller intervals and to iteratively use the sensitivity to track the path of optimal solutions.
+This is known as a path-following method.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Path-Following Based on Sensitivity Properties}
+The basic idea of a path-following method is to reach the solution of the problem at a final parameter value $\boldsymbol{p}_f$ by tracing a sequence of solutions for a series of parameter values given by $\boldsymbol{p}(t_k)=(1-t_k)\boldsymbol{p}_0+t_k\boldsymbol{p}_f$ where $0=t_0<t_1<\ldots<t_k<\ldots<t_N=1$.
+The new direction is found by evaluating the sensitivity at the current point.
+It is common to include a corrector element into the QP that helps improve the ability of this method to find the correct solution.
+\par
+We approximate \ref{eq:param_NLP} by a QP, linearized with respect to both $\boldsymbol{\chi}$ and $\boldsymbol{p}$, and enforce the equality of the strongly-active constraints.
+\begin{mini}
+	{\Delta\boldsymbol{\chi}\Delta\boldsymbol{p}}{\frac{1}{2}\Delta\boldsymbol{\chi}^T\nabla_{\boldsymbol{\chi}\boldsymbol{\chi}}^2\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)^T\Delta\boldsymbol{\chi}+\Delta\boldsymbol{\chi}^T\nabla_{\boldsymbol{p}\boldsymbol{\chi}}^2\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\Delta\boldsymbol{p}+\nabla_{\boldsymbol{p}}F^T\Delta\boldsymbol{\chi}+\nabla_{\boldsymbol{p}}F\Delta\boldsymbol{p}+\frac{1}{2}\Delta\boldsymbol{p}^T\nabla_{\boldsymbol{p}\boldsymbol{p}}\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\Delta\boldsymbol{p}}{}{}
+	\addConstraint{c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0+\Delta\boldsymbol{p})^T\Delta\boldsymbol{\chi}=0}{\qquad i=1,...n_c}
+	\addConstraint{g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0+\Delta\boldsymbol{p})^T\Delta\boldsymbol{\chi}=0}{\qquad j\in K_+}
+	\addConstraint{g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0+\Delta\boldsymbol{p})^T\Delta\boldsymbol{\chi}\leq0}{\qquad j\in\{1,\ldots,n_g/K_+\}}
+\end{mini}
+\par
+For the NMPC problem $\mathcal{P}_{NMPC}$, the parameter $\boldsymbol{p}$ corresponds to the current ``initial" state ($\boldsymbol{x}_k$).
+The cost function is independent of $\boldsymbol{p}$ which means that $\nabla_{\boldsymbol{p}}F=0$.
+In addition, the parameter is linear in the constraints so $\nabla_{\boldsymbol{p}}c$ and $\nabla_{\boldsymbol{p}}g$ are constants.
+Applying these simplifications we can write the above QP as:
+\begin{mini}
+	{\Delta\boldsymbol{\chi}}{\frac{1}{2}\Delta\boldsymbol{\chi}^T\nabla_{\boldsymbol{\chi}\boldsymbol{\chi}}\Lagrange(\boldsymbol{\chi}^*,\boldsymbol{p}_0+\Delta\boldsymbol{p},\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\Delta\boldsymbol{\chi}+\nabla_{\boldsymbol{\chi}}F^T\Delta\boldsymbol{\chi}}{\label{eq:QP_pc}}{}
+	\addConstraint{c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}c_i(\boldsymbol{\chi}^*,\boldsymbol{p}_0)=0}{\qquad i=0,\ldots,n_c}
+	\addConstraint{g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0)=0}{\qquad j\in K_+}
+	\addConstraint{g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0-\Delta\boldsymbol{p})+\nabla_{\boldsymbol{\chi}}g_j(\boldsymbol{\chi}^*,\boldsymbol{p}_0)\leq0}{\qquad j\in\{1,\ldots,n_g\}/K_+}
+\end{mini}
+The QP formulation shown above is known as the predictor-corrector form.
+This QP tries to estimate how the NLP solution changes as the parameter does in the predictor component and refines the estimate, as the corrector, so that the KKT conditions are more closely satisfied at the new parameter.
+\par
+The predictor-corrector QP is well suited for use in a path-following algorithm.
+Recall that we use the parameter equation: $\boldsymbol{p}(t_k)=(1-t_k)\boldsymbol{p}_0+t_k\boldsymbol{p}_f$.
+ At each point $\boldsymbol{p}(t_k)$, the QP is solved and the primal-dual solutions are updated as:
+\begin{align}
+	\boldsymbol{\chi}(t_{k+1})&=\boldsymbol{\chi}+\Delta\boldsymbol{\chi}\\
+	\boldsymbol{\lambda}(t_{k+1})&=\Delta\boldsymbol{\lambda}\\
+	\boldsymbol{\mu}(t_{k+1})&=\Delta\boldsymbol{\mu}
+\end{align}
+where $\boldsymbol{\chi}$ is obtained from the primal solution of the QP (\ref{eq:QP_pc}) and where $\Delta\boldsymbol{\lambda}$ and $\Delta\boldsymbol{\mu}$ correspond to the Lagrange multipliers of the QP.
+\par
+The QP can detect changes in the active set along the path.
+If a constraint becomes inactive, the corresponding mulitiplier $\boldsymbol{\mu}_j$ will first become weakly active meaning that it is added to the set $K_0$.
+If a new constraint becomes active, the corresponding linearized inequality constraint in the QP will be active and tracked at the next iteration.
+\par
+The path-following algorithm is summarized with its main steps in Algorithm \ref{alg:path}.
+This algorithm is used to find a fast approximation of the optimal NLP solution corresponding to the new available state measurement; this is done by following the optimal solution path from the predicted state to the measured state.\\
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{initial variables from NLP $\boldsymbol{\chi}^*(\boldsymbol{p}_0),\boldsymbol{\lambda}^*(\boldsymbol{p}_0),\boldsymbol{\mu}^*(\boldsymbol{p}_0)$}
+ fix stepsize $\Delta t$, and set $N=\frac{1}{\Delta t}$\;
+ set initial parameter value $\boldsymbol{p}_0$,\;
+ set initial parameter value $\boldsymbol{p}_f$,\;
+ set $t=0$\;
+ \For{$k\leftarrow 1$ \KwTo $N$}{
+  Compute step $\Delta \boldsymbol{p}=\boldsymbol{p}_k-\boldsymbol{p}_{k-1}$\;
+  Solve QP problem\;
+  \If{QP is feasible}{
+   $\boldsymbol{\chi}\leftarrow\boldsymbol{\chi}+\Delta\boldsymbol{\chi}$\;
+   Update dual variables appropriately using either the pure-predictor method or the predictor-corrector method\;
+   $t\leftarrow t+\Delta t$\;
+   $k\leftarrow k+1$\;
+   }
+  \Else{
+  	$\Delta t\leftarrow\alpha_1\Delta t$\;
+	$t\leftarrow t-\alpha_1\Delta t$\;}
+}
+ \caption{Path-following algorithm}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Path-Following asNMPC}
+As previously mentioned, for asNMPC, at every time step the full NLP is solved for a predicted state and when a new measurement is available, the precomputed NLP solution is updated by tracking the optimal solution curve from the predicted initial state to the new measured state.
+We highlight the fact that the solution of the last QP along the path corresponds to the updated NLP solution and only the inputs from the last QP become inputs to the plant.
+One unique quality of this method is that strong and weakly active inequality constraints are differentiated between.
+Strongly-active inequalities are linearized and included as equality constraints in the QP, but weakly active constraints are linearized and included as inequality constraints in the QP.
+This helps to ensure that the true solution path is tracked more accurately, particularly in the case that the full Hessian of the optimization problem is non-convex \cite{economics}.
 
