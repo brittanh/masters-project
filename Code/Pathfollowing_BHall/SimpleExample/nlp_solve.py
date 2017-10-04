@@ -4,7 +4,7 @@
     @purpose: NLP solver
     @author: Brittany Hall
     @date: 18.09.2017
-    @version: 1
+    @version: 0.1
     @updates:
 """
 from casadi import *
@@ -27,5 +27,5 @@ def nlp_solve(prob, obj, p_init, x_init, y_init):
         lagm = sol['lam_x']
         lam_opt = lagm[0]
         mu_opt = lagm[1]
-        print('x_opt:',x_opt,'lambda:',lam_opt,'mu:',mu_opt)
+        #print('x_opt:',x_opt,'lambda:',lam_opt,'mu:',mu_opt)
         return(x_opt, lam_opt, mu_opt, con)
