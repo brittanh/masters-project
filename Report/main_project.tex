@@ -3,16 +3,22 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
-\usepackage{caption,booktabs,array}
+\usepackage[labelfont=bf]{caption}
+\usepackage{booktabs,array}
 \usepackage{tocbibind}
 \usepackage[toc,page]{appendix}
 \usepackage{fancyhdr}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage[backend=bibtex]{biblatex}
+\usepackage[style=authoryear,backend=bibtex]{biblatex}
 \usepackage{my-notation}
 \usepackage{bm}
 \usepackage[short]{optidef}
+\usepackage{mhchem}
+\usepackage{float}
+\usepackage{siunitx}
+\usepackage{enumitem}
+\usepackage{booktabs}
 
 \usepackage[ruled, algochapter, noend, linesnumbered,ruled]{algorithm2e}
 \addbibresource{chapters/references.bib}
@@ -23,6 +29,11 @@
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
 \usepackage{algorithm2e}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    linktoc=all % 'all' will create links for everything in the TOC
+}
 
 \begin{document}
 %Titlepage
@@ -53,7 +64,6 @@
 \chapter{Introduction}
 \input{chapters/introduction}
 \label{ch:intro}
-
 %
 \chapter{NMPC}
 \input{chapters/NMPC}
@@ -61,7 +71,11 @@
 \chapter{Simple Example}
 \input{chapters/simple}
 %
+\chapter{Numerical Case Study}
+\input{chapters/numerical}
+%
 \chapter{Results}
+\input{chapters/results}
 %
 \chapter{Discussion}
 %

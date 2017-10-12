@@ -107,7 +107,7 @@ def idealRSR(structDaeModel=False, **kwargs):
     # (multicomponent ideal VLE, Stichlmair-Fair, 'Distillation', p. 36, 1998)
     for i in range(NT-1):
         for j in range(NC - 1):
-            y[i,j] = x[i,j]*alpha[j]/(1 + cd.mul(alpha[:] - 1.0,x[i,:]))
+            y[i,j] = x[i,j]*alpha[j]/(1 + cd.mtimes(alpha[:] - 1.0,x[i,:]))
 
 #    z_F = x[NT,:]
 #==============================================================================
@@ -168,15 +168,15 @@ def idealRSR(structDaeModel=False, **kwargs):
         # Get the state structure for rhs assignment
         # Assign right hand side
         rhs = cdtl.struct_SX(states)
-        rhs = cd.vertcat((dxdt,dMdt))
+        rhs = cd.vertcat(dxdt,dMdt)
         print states
         print inputs
 
         return t, states, inputs, rhs
 
     else:
-        lhs = cd.vertcat((x,M))
-        rhs = cd.vertcat((dxdt,dMdt))
+        lhs = cd.vertcat(x,M)
+        rhs = cd.vertcat(dxdt,dMdt)
 
         return t, states, inputs, rhs
 

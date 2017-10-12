@@ -18,47 +18,54 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: main_project-blx.bib
 Database file #2: chapters/references.bib
+I was expecting a `,' or a `}'---line 16 of file chapters/references.bib
+ :  
+ :  place = {Hoboken, NJ,USA}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "framework"
 Biblatex version: 3.3
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
-You've used 4 entries,
+You've used 6 entries,
             6256 wiz_defined-function locations,
-            1196 strings with 9020 characters,
-and the built_in function-call counts, 18608 in all, are:
-= -- 1203
-> -- 429
-< -- 102
-+ -- 433
-- -- 172
-* -- 1429
-:= -- 1989
+            1209 strings with 9412 characters,
+and the built_in function-call counts, 34404 in all, are:
+= -- 2472
+> -- 820
+< -- 339
++ -- 825
+- -- 257
+* -- 2236
+:= -- 3079
 add.period$ -- 0
-call.type$ -- 4
-change.case$ -- 38
-chr.to.int$ -- 36
-cite$ -- 6
-duplicate$ -- 1786
-empty$ -- 1713
-format.name$ -- 222
-if$ -- 3888
+call.type$ -- 6
+change.case$ -- 241
+chr.to.int$ -- 31
+cite$ -- 10
+duplicate$ -- 3450
+empty$ -- 3016
+format.name$ -- 359
+if$ -- 7525
 int.to.chr$ -- 0
-int.to.str$ -- 7
+int.to.str$ -- 14
 missing$ -- 0
-newline$ -- 113
-num.names$ -- 133
-pop$ -- 1058
+newline$ -- 179
+num.names$ -- 402
+pop$ -- 1756
 preamble$ -- 1
-purify$ -- 56
+purify$ -- 269
 quote$ -- 0
-skip$ -- 614
+skip$ -- 1479
 stack$ -- 0
-substring$ -- 2123
-swap$ -- 463
-text.length$ -- 110
-text.prefix$ -- 3
+substring$ -- 3794
+swap$ -- 948
+text.length$ -- 172
+text.prefix$ -- 5
 top$ -- 1
-type$ -- 124
+type$ -- 191
 warning$ -- 0
-while$ -- 242
+while$ -- 353
 width$ -- 0
-write$ -- 110
+write$ -- 174
+(There was 1 error message)

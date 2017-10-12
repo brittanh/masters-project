@@ -16,7 +16,38 @@
   {}
 \endgroup
 
-\sortlist[entry]{nty/global/}
+\sortlist[entry]{nyt/global/}
+  \entry{Andersson2013b}{thesis}{}
+    \name{author}{1}{}{%
+      {{hash=AJ}{%
+         family={Andersson},
+         family_i={A\bibinitperiod},
+         given={Joel},
+         given_i={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AJ1}
+    \strng{fullhash}{AJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2013}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{A General-Purpose Software Framework for Dynamic
+  Optimization}
+    \list{location}{2}{%
+      {Department of Electrical Engineering (ESAT/SCD)}%
+      {Optimization in Engineering Center, Kasteelpark Arenberg 10
+  3001-Heverlee Belgium}%
+    }
+    \list{institution}{1}{%
+      {Arenberg Doctoral School- KU Leuven}%
+    }
+    \field{type}{phdthesis}
+    \field{year}{2013}
+    \warn{\item Invalid format of field 'month'}
+  \endentry
+
   \entry{perturb}{article}{}
     \name{author}{2}{}{%
       {{hash=BJF}{%
@@ -36,6 +67,7 @@
     \strng{fullhash}{BJFSA1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
+    \field{labelyear}{1998}
     \field{sortinit}{B}
     \field{sortinithash}{B}
     \field{pages}{228\bibrangedash 264}
@@ -45,33 +77,68 @@
     \field{year}{1998}
   \endentry
 
-  \entry{framework}{article}{}
-    \name{author}{2}{}{%
-      {{hash=LSF}{%
-         family={Lozano\bibnamedelima Santamaria},
-         family_i={L\bibinitperiod\bibinitdelim S\bibinitperiod},
-         given={Federico},
-         given_i={F\bibinitperiod},
-      }}%
-      {{hash=GJ}{%
-         family={Gomez},
-         family_i={G\bibinitperiod},
-         given={Jorge},
+  \entry{fast}{article}{}
+    \name{author}{3}{}{%
+      {{hash=JJ}{%
+         family={J{\"a}schke},
+         family_i={J\bibinitperiod},
+         given={Johannes},
          given_i={J\bibinitperiod},
       }}%
+      {{hash=YX}{%
+         family={Yang},
+         family_i={Y\bibinitperiod},
+         given={Xue},
+         given_i={X\bibinitperiod},
+      }}%
+      {{hash=BLT}{%
+         family={Biegler},
+         family_i={B\bibinitperiod},
+         given={Lorenz\bibnamedelima T.},
+         given_i={L\bibinitperiod\bibinitdelim T\bibinitperiod},
+      }}%
     }
-    \strng{namehash}{LSFGJ1}
-    \strng{fullhash}{LSFGJ1}
+    \strng{namehash}{JJYXBLT1}
+    \strng{fullhash}{JJYXBLT1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{sortinit}{L}
-    \field{sortinithash}{L}
-    \field{booktitle}{Computers & Chemical Engineering}
-    \field{title}{Framework in PYOMO for the assessment and implementation of
-  (as)NMPC controllers}
-    \field{volume}{92}
-    \field{month}{05}
-    \field{year}{2016}
+    \field{labelyear}{2014}
+    \field{sortinit}{J}
+    \field{sortinithash}{J}
+    \field{title}{Fast Economic Model Predictive Control Based on
+  NLP-Sensitivities}
+    \field{journaltitle}{Journal of Process Control}
+    \field{year}{2014}
+  \endentry
+
+  \entry{model}{article}{}
+    \name{author}{2}{}{%
+      {{hash=SS}{%
+         family={Skogestad},
+         family_i={S\bibinitperiod},
+         given={Sigurd},
+         given_i={S\bibinitperiod},
+      }}%
+      {{hash=PI}{%
+         family={Postlethwaite},
+         family_i={P\bibinitperiod},
+         given={Ian},
+         given_i={I\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Wiley-Interscience}%
+    }
+    \strng{namehash}{SSPI1}
+    \strng{fullhash}{SSPI1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{labelyear}{2005}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{edition}{2}
+    \field{title}{Multivariable Feedback Control: Analysis and Design}
+    \field{year}{2005}
   \endentry
 
   \entry{economic}{article}{}
@@ -102,6 +169,7 @@
     \strng{fullhash}{SEKVJJ1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
+    \field{labelyear}{2017}
     \field{sortinit}{S}
     \field{sortinithash}{S}
     \field{pages}{8}

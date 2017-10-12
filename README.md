@@ -1,18 +1,29 @@
 # masters-project
-Brittany Hall's Specialization Project Autumn 2017
+## Brittany Hall's Specialization Project Autumn 2017 ##
 
-Based on work done by Eka Suwartadi (https://github.com/detu/licq-path-following).
+### Norwegian University of Science and Technology (Trondheim, Norway)
 
-Used his work and converted it to use Python.
-The code requires:
-** Python
-** Pyomo
-** 
+Based on work done by Eka Suwartadi: [Implementation of path-following algorithm for LICQ case study](https://github.com/detu/licq-path-following).
+Eka's work was utilised throughout this project to create an equivalent but more universal algorithm in Python.
 
-This code is an implementation of economic NMPC scheme.
-The workflow is:
-1. steady-state optimization (gives the set-point)
-2. Dynamic optimization (MPC controller)
+To use the code the following elements are required to be installed:
 
-The steady-state code is located at \models\ folder and is named distACstrSS.py
+* Python 2.7
+* [numpy](http://www.numpy.org/)
+* casadi
+* [scikits.odes](https://github.com/bmcage/odes)
+	* Read requirements before [install page](https://scikits-odes.readthedocs.io/en/latest/installation.html)
+		* Requires C compiler
+		* Fortran compiler (i.e. gfortran)
+		* [Sundials 2.7.0](https://computation.llnl.gov/projects/sundials/sundials-software)
 
+## Purpose
+This code implements economic NMPC using a path-following algorithm.
+## Getting Started
+The scripts work as follows:
+
+## Distillation Column Model ##
+
+The distillation column model used was developed by Sigurd Skogestad and is referred to as "Column A".
+
+Details of the model and the original files can be found on his [website](http://folk.ntnu.no/skoge/book/matlab_m/cola/cola.html).
