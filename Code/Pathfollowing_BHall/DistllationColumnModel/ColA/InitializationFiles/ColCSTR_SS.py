@@ -11,7 +11,7 @@
 
 from scipy.io import savemat
 from casadi import *
-from numpy import append, ones, transpose, shape, abs, size, concatenate, array
+from numpy import append, ones, transpose, shape, abs, size, concatenate, array, savetxt
 from scipy.linalg import eigvals
 #from sympy import Matrix
 from buildmodel import *
@@ -73,12 +73,16 @@ print('IPOPT solver runtime = %f\n', elapsednlp)
 
 u = sol['x']
 lam = sol['lam_g']
-lam[NT+1:end] = -1*lam[NT+1:end]
+lam[NT+1:-1] = -1*lam[NT+1:-1]
+lam = lam.full().flatten()
+Xinit = u.full().flatten()
 
-Xinit = u
-#Saving steady state data to be used in dynamic optimization
-savemat('CstrDistXinit1', Xinit)
-savemat('LamdaCstrDist1.mat', lam)
+
+#Saving steady state data to be used in dynamic optimization (.mat and .csv)
+savemat('CstrDistXinit.mat', {'Xinit': Xinit}, do_compression=True)
+savemat('LamdaCstrDist.mat', {'lambda':lam}, do_compression=True)
+savetxt('CstrDistXinit.csv', Xinit, delimiter=',')
+savetxt('LambdaCstrDist.csv', lam, delimiter=',')
 
 """
 Compute Hessian and perform Greshgorin convexification
@@ -86,21 +90,22 @@ Compute Hessian and perform Greshgorin convexification
 xsol = u
 lamda = {}
 lamda['eqnonlin'] = lam
-l = vertcat(l[:])
-L = obj + transpose(l)*eq
 
-Lagr = Function('Lagr', [x,l],[L])
-H = Function('H', [x,l], hessian(Lagr(x,l)))
-cons = Function('Cons', [x], [eq])
-Jcon = Function('Jcon', [x,cons], jacobian(cons(x,cons)))
+L = obj + l*eq # Lagrangian
+
+Lagr = Function('Lagr', [x, l], [L], ['x','l'], ['Lagr'])
+H = Function(Lagr.hessian('x','Lagr'))
+cons = Function('Const', [x], [eq],['x'], ['cons'])
+Jcon = Function(cons.jacobian('x','cons'))
 
 eqVal = cons(xsol)
 Hx = H(xsol, lamda['eqnonlin'])
-Hx = full(Hx)
-Jac = Jcon(xsol)
-Jac = full(Jac)
+Hx = Hx.full()
 
-#Nullspace of the constraints and its eigenvalue
+Jac = Jcon(xsol)
+Jac = Jac.full()
+
+# Nullspace of the constraints and its eigenvalue
 rH = transpose(Jac.nullspace())*Hx*Jac.nullspace()
 eigen_RH = eigvals(rH)
 

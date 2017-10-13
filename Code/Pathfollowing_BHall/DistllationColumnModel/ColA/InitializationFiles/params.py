@@ -41,16 +41,16 @@ pD = 0
 lbu = array([[0.1], [0.1], [0.1], [0.1], [0.1]])
 ubu = array([[10],[4.008],[10],[1.0],[1.0]])
 #State bounds
-x_min = zeros((2*NT+3,1))
-x_max = ones((2*NT+3,1))
+x_min = zeros((2*NT+2,1))
+x_max = ones((2*NT+2,1))
 xB_max = 0.1
 x_max[0] = xB_max
-x_min[2*NT+2] = 0.3
-x_max[2*NT+2] = 0.7
+x_min[2*NT+1] = 0.3
+x_max[2*NT+1] = 0.7
 lbx = concatenate((x_min, lbu))
 ubx = concatenate((x_max, ubu))
-lbg = zeros((2*NT+3,1))
-ubg = zeros((2*NT+3,1))
+lbg = zeros((2*NT+2,1))
+ubg = zeros((2*NT+2,1))
 
 #Collecting all parameters into a dictionary
 params = {}
