@@ -13,7 +13,6 @@ from scipy.io import savemat
 from casadi import *
 from numpy import append, ones, transpose, shape, abs, size, concatenate, array, savetxt
 from scipy.linalg import eigvals
-#from sympy import Matrix
 from buildmodel import *
 from params import * #imports cstr and distillation column parameters
 from nlp_solve import *
@@ -94,7 +93,7 @@ lamda['eqnonlin'] = lam
 L = obj + l*eq # Lagrangian
 
 Lagr = Function('Lagr', [x, l], [L], ['x','l'], ['Lagr'])
-H = Function(Lagr.hessian('x','Lagr'))
+H = Function('H',[hessian(Lagr),['x','Lagr']])
 cons = Function('Const', [x], [eq],['x'], ['cons'])
 Jcon = Function(cons.jacobian('x','cons'))
 
@@ -110,7 +109,7 @@ rH = transpose(Jac.nullspace())*Hx*Jac.nullspace()
 eigen_RH = eigvals(rH)
 
 #Calculating the Greshgorin convexification
-def Greshgorin(H):
+def Gershgorin(H):
     numH = H.shape[0]
     Q = zeros((numH,numH))
     delta = 2.5 #with measurement noise of 1 percent
@@ -124,7 +123,7 @@ def Greshgorin(H):
     Q = diag(Q)
     return H, Q
 
-Hxxl, Qmax = Greshgorin(Hx)
+Hxxl, Qmax = Gershgorin(Hx)
 savemat('Qmax', Qmax)
 
 #Check at some initial point for optimization

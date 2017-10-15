@@ -8,8 +8,8 @@
     @updates:
 """
 
-from casadi import *
-from numpy import array, ones, zeros
+from casadi import SX, Function, vertcat
+from numpy import array, ones, zeros, exp
 
 
 #Defining the problem
@@ -30,10 +30,10 @@ def obj(x, y, p, neq, niq, n, np):
     """
     p = SX.sym('p',np)                                              #Parameters
     x = SX.sym('x',n)                                                 #Variable
-    f = p[0]*x[0]**3+x[1]**2                                   #Objective array
+    f = p[0]*x[0]**3 + x[1]**2                                 #Objective array
     f_fun = Function('f_fun',[x,p],[p[0]*x[0]**3+x[1]**2])  #Objective function
     
-    con = vertcat(exp(-x[0])-x[1],p[1]-x[0])                #Constraint array
+    con = vertcat(exp(-x[0])-x[1],p[1]-x[0])                  #Constraint array
     conf = Function('conf',[x,p],[exp(-x[0])-x[1],p[1]-x[0]])#Constraint function
     
     
@@ -41,7 +41,7 @@ def obj(x, y, p, neq, niq, n, np):
     ubx = 1e16*ones([1,n])                                #Variable upper bound
     lbx = -1e16*ones([1,n])                               #Variable lower bound
     ubg = zeros([1,niq+neq])                            #Constraint upper bound
-    lbg= -1e16*ones([1,niq+neq])                         #Constraint lower boun
+    lbg= -1e16*ones([1,niq+neq])                        #Constraint lower bound
     return x, p, f, f_fun, con, conf, ubx, lbx, ubg, lbg
 
 

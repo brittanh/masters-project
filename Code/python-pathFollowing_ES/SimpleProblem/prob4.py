@@ -63,7 +63,7 @@ def objective(x,y,p):
     cp.setInput(x,'v')
     cp.setInput(p,'t')
     cst.setInput(x,'v')
-    cst.setInput(p,'t') 
+    cst.setInput(p,'t')
 
     f.evaluate()
     g.evaluate()
@@ -72,7 +72,7 @@ def objective(x,y,p):
     cp.evaluate()
     Lxp.evaluate()
     cst.evaluate()
-    
+
     f   = array(f.getOutput())
     '''
     g   = csc_matrix(g.getOutput())

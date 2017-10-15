@@ -7,7 +7,7 @@
     @version: 0.1
     @updates:
 """
-from casadi import *
+from casadi import nlpsol
 
 def nlp_solve(prob, obj, p_init, x_init, y_init):
     """
@@ -23,7 +23,7 @@ def nlp_solve(prob, obj, p_init, x_init, y_init):
         solver = nlpsol('solver', 'ipopt', nlp)
         sol = solver(x0 = x_init, p = p_init,
                     lbg = lbg, ubg = ubg, ubx = ubx, lbx = lbx)
-        x_opt = sol['x']                                         #solving for x
+        x_opt = sol['x']                                         #Solving for x
         lagm = sol['lam_x']
         lam_opt = lagm[0]
         mu_opt = lagm[1]

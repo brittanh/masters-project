@@ -7,8 +7,8 @@
     @version: 0.1
     @updates:
 """
-from numpy import *
-from casadi import *
+from numpy import array, append, zeros
+from casadi import vertcat, gradient, jacobian, hessian, Function, conic, SX, mtimes
 from problem import prob, obj
 
 #p_init = array([1,-4])                                 #initial parameter value
@@ -36,15 +36,16 @@ def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt):
     """
     #Importing problem to be solved
     n, np, neq, niq, name = prob()
-    x, p, f, f_fun, con, conf, ubx, lbx, ubg, lbg = obj(x_init,y_init,p_init, neq, niq, n, np)
+    x, p, f, f_fun, con, conf, ubx, lbx, ubg, lbg = obj(x_init, y_init, p_init, neq, niq, n, np)
 
     #Deteriming constraint types
     eq_con_ind = array([])
     iq_con_ind = array([])
     eq_con = array([])
     iq_con = array([])
+    tol = 1e-6
     for i in range(0,len(lbg[0])):
-        if lbg[0,i] == 0:
+        if lbg[0,i] == 0 + tol:
             eq_con = vertcat(eq_con,con[i])
             eq_con_ind = append(eq_con_ind,i)
         elif lbg[0,i] < 0:
@@ -65,28 +66,27 @@ def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt):
     nk_zt = len(k_zero_tilde)                   #number of inactive constraints
 
     #Calculating Lagrangian
-    lam = SX.sym('lam',neq)         #lagrangian multiplier equality constraints
-    mu = SX.sym('mu',niq)         #lagrangian multiplier inequality constraints
-    #lag_f = Function('lag_f',[x,p,lam,mu],[f+mtimes(lam.T,eq_con)+ mtimes(mu.T,iq_con)])
-    lag_f = f+mtimes(lam.T,eq_con)+ mtimes(mu.T,iq_con)    #Lagrangian equation
+    lam = SX.sym('lam',neq)         #Lagrangian multiplier equality constraints
+    mu = SX.sym('mu',niq)         #Lagrangian multiplier inequality constraints
+    lag_f = f + mtimes(lam.T,eq_con)+ mtimes(mu.T,iq_con)  #Lagrangian equation
 
     #Calculating derivatives
-    g = gradient(f, x)             #derivative of objective function (g matrix)
+    g = gradient(f, x)                        #Derivative of objective function
     g_fun = Function('g_fun',[x,p], [gradient(f, x)])
-    H = 2*jacobian(jacobian(lag_f,x),x)#second derivative of the Lagrangian (H matrix)
+    H = 2*jacobian(gradient(lag_f,x),x)    #Second derivative of the Lagrangian
     H_fun = Function('H_fun',[x,p,lam,mu],[jacobian(jacobian(lag_f,x),x)])
 
     if len(eq_con_ind)>0:
-        deq = jacobian(eq_con,x)            #derivative of equality constraints
+        deq = jacobian(eq_con,x)            #Derivative of equality constraints
     else:
         deq = array([])
     if len(iq_con_ind)>0:
-        diq = jacobian(iq_con,x)          #derivative of inequality constraints
+        diq = jacobian(iq_con,x)          #Derivative of inequality constraints
     else:
         diq = array([])
 
     #Creating constraint matrices
-    nc = niq + neq                                 #total number of constraints
+    nc = niq + neq                                 #Total number of constraints
     if (niq>0) and (neq>0):                #Equality and inequality constraints
         if (nk_zt >0):                              #Inactive constraints exist
             A = SX.zeros((nc,n))
@@ -148,11 +148,12 @@ def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt):
         print('WARNING: uba matrix is not the correct dimensions or matrix type')
 
     #Evaluating QP matrices at optimal points
-    H_opt = 2*H_fun(x_init,p_init,lam_opt,mu_opt)
+    H_opt = H_fun(x_init,p_init,lam_opt,mu_opt)
     g_opt = g_fun(x_init, p_init)
     A_opt = A_fun(x_init,p_init)
     lba_opt = lba_fun(x_init,p_init)
     uba_opt = uba_fun(x_init,p_init)
+
     #Defining QP structure
     qp = {}
     qp['h'] = H_opt.sparsity()
@@ -161,15 +162,23 @@ def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt):
     optimal = optimize(h=H_opt, g=g_opt, a=A_opt, lba=lba_opt, uba=uba_opt, x0=x_init)
 
     x_qpopt = optimal['x']
+    if x_qpopt.shape == x_init.shape:
+        qp_exit = 'optimal'
+    else:
+        qp_exit = ''
     lag_qpopt = optimal['lam_a']
+    print lag_qpopt
     #determing Lagrangian constants
-    lam_qpopt = zeros((nk_zt,1))
-    mu_qpopt = zeros((nk_pt,1))
-    for j in range(0,len(k_plus_tilde)):
-        lam_qpopt[j] = lag_qpopt[int(k_plus_tilde[j])]
-    for k in range(0,len(k_zero_tilde)):
-        mu_qpopt[k] = lag_qpopt[int(k_zero_tilde[j])]
-#    print('lam:',lam_qpopt)
-#    print('mu:',mu_qpopt)
-    return(optimal,x_qpopt,lam_qpopt,mu_qpopt)
-#qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt)
+    lam_qpopt = zeros((nk_pt,1)) #Lagrange multiplier of active constraints
+    mu_qpopt = zeros((nk_zt,1)) #Lagrange multiplier of inactive constraints
+    if nk_pt > 0:
+        for j in range(0,len(k_plus_tilde)):
+            lam_qpopt[j] = lag_qpopt[int(k_plus_tilde[j])]
+    print nk_zt
+
+    if nk_zt > 0:
+        for k in range(0,len(k_zero_tilde)):
+            print lag_qpopt[int(k_zero_tilde[k])]
+            mu_qpopt[k] = lag_qpopt[int(k_zero_tilde[k])]
+    raw_input()
+    return qp_exit, optimal, x_qpopt, lam_qpopt, mu_qpopt

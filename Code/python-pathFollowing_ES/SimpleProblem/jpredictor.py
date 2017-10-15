@@ -64,6 +64,8 @@ def jpredictor(prob, derivatives, p_init, p_final, x_init, y_init, delta_t, lb, 
         step = delta_t * (p_final - p_init)
         # solve QP problem
         qp_exit, qp_val, y, dual, oqp, k_zero_tilde, k_plus_tilde, g = qp_solve(prob, derivatives, p_init, x_init, y_init, step, lb, ub)
+        print qp_val
+        raw_input()
         
         if (qp_exit == 'optimal'):
             # call LP solver 

@@ -169,8 +169,14 @@ The new objective function for the regularized stage is written as:
 	J_m = p_FF_0 + p_VV_B-p_BB-p_DD+(\boldsymbol{z}-\boldsymbol{x}_s)^T\boldsymbol{Q}_1(\boldsymbol{z}-\boldsymbol{x}_s)+(\boldsymbol{v}-\boldsymbol{u}_s)^T\boldsymbol{Q}_2(\boldsymbol{v}-\boldsymbol{u}_s)
 \end{equation}
 The weights ($\boldsymbol{Q}_1$ and $\boldsymbol{Q}_2$) are selected to make the rotated stage cost of the steady state problem strongly convex. 
-The method used to construct these weights is discussed in more detail in \cite{fast}.
-A stable economic NMPC controller can be obtained using this method.
+To find a valid diagonal regularization matrix $Q$ we utilize the Gershgorin property for a matrix which states for a matrix $\boldsymbol{A}=(a_{ij})$:
+	\begin{equation}
+		a_{ii}-\sum_{i\neq j}|a_{ij}|\leq \mu_i\leq a_{ii}+\sum_{i\neq j} |a_{ij}|
+	\end{equation}
+where $\mu_i$ are the eigenvalues of $\boldsymbol{A}$\cite{fast}.
+This property can be utilized to systematically find the regularization terms such that the rotated stage cost will be strongly convex and thus
+a stable economic NMPC controller can be obtained using this method.
+For further details on this method see \cite{fast}.
 \par
 The distillation column is initialized using the steady states values for a feed rate of $F_0 = 0.29$ \si{\kilo\mole\per\minute} meaning that the controller is essentially controlling for a throughput change from $F_0 = 0.29$ \si{\kilo\mole\per\minute} to $F_0 = 0.30$ \si{\kilo\mole\per\minute}.
 The simulation is run for 150 MPC iterations with a sample time of 1 minute.
