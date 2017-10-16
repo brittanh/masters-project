@@ -27,9 +27,10 @@ The idea is that at sample time $k$, an estimate or measurement of the state $\b
 The first part of the optimal control sequence is then the plant input such that $\boldsymbol{u}_k=\boldsymbol{v}_0^*$.
 This part of the solution defines an implicit feedback law $\boldsymbol{u}_k=\kappa(\boldsymbol{x}_k)$, and the system evolves according to Equation \ref{eq:nonlin}.
 At the next sample time $k+1$, when the measurement of the new state is obtained, the procedure is repeated.
-Algorithm 1 summarizes the NMPC algorithm.\\
+Algorithm \ref{alg:NMPC} summarizes the NMPC algorithm.\\
 \begin{algorithm}[H]
  \caption{General NMPC algorithm.}
+ \label{alg:NMPC}
 	\SetAlgoLined
 	set $k\leftarrow 0$\\
 	\While{MPC is running}{
@@ -132,7 +133,7 @@ The QP can detect changes in the active set along the path.
 If a constraint becomes inactive, the corresponding mulitiplier $\boldsymbol{\mu}_j$ will first become weakly active meaning that it is added to the set $K_0$.
 If a new constraint becomes active, the corresponding linearized inequality constraint in the QP will be active and tracked at the next iteration.
 \par
-The path-following algorithm is summarized with its main steps in Algorithm \ref{alg:path}.
+The path-following algorithm is summarized with its main steps in Algorithm \ref{alg:pathfollowing}.
 This algorithm is used to find a fast approximation of the optimal NLP solution corresponding to the new available state measurement; this is done by following the optimal solution path from the predicted state to the measured state.\\
 \begin{algorithm}[H]
 \SetAlgoLined
@@ -155,6 +156,7 @@ This algorithm is used to find a fast approximation of the optimal NLP solution 
 	$t\leftarrow t-\alpha_1\Delta t$\;}
 }
  \caption{Path-following algorithm}
+ \label{alg:pathfollowing}
 \end{algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
