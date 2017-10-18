@@ -13,10 +13,10 @@ from system import *
 from compObjFn import *
 from solveOpt import *
 
-global NT, nx
-NT = 41 #number of stages
-def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0):
+def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
 
+    #Unpacking required parameters
+    NT = params['dist']['NT']
     #Constructing empty arrays for later use
     Tall = []
     Xall = zeros((MPCit, size(xmeasure, axis = 0)))
@@ -35,8 +35,8 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0):
     noise = data['noise']
 
     while (iter <= MPCit):
-        print('------------------------------------------------------------\n')
-        print('MPC iteration: %d\n', iter)
+        print "-----------------------------------------------------------\n"
+        print "MPC iteration: %d \n" %(iter)
 
         #Obtaining new initial value
         def measureInitVal(tmeasure, xmeasure):
@@ -52,7 +52,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0):
         x0_measure = x0 + measure_noise     #Adding measurement noise to states
 
         #advanced-step NMPC
-        primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_nlp_opt, x_nlp_opt, x0_measure)
+        primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_nlp_opt, x_nlp_opt, x0_measure, params)
 
         #re-arrange NLP solutions
         #turning vectors into matrices to make easier to plot

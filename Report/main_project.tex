@@ -1,5 +1,5 @@
 \documentclass[12pt,a4paper]{report}
-
+\usepackage[margin=1.25in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
@@ -20,8 +20,11 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{subcaption}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{definition}{Defintion}[chapter]
+\newtheorem{exmp}{Example}[chapter]
 
-\usepackage[ruled, algochapter, noend, linesnumbered,ruled]{algorithm2e}
+\usepackage[ruled, algochapter, noend, linesnumbered, ruled]{algorithm2e}
 \addbibresource{chapters/references.bib}
 \pagestyle{fancy}
 \fancyhead{}
@@ -48,8 +51,10 @@
 	{\huge\bfseries Sensitivity-Based Economic NMPC with a Path-Following Approach in Python\par}
 	\vspace{2cm}
 	{\Large\itshape Brittany Hall\par}
+	\vspace{2cm}
+	{\large Department of Chemical Engineering}
 	\vfill
-	supervised by\par
+	Supervised by\par
 	Johannes J{\"a}schke and Eka Suwartadi
 
 	\vfill
@@ -68,9 +73,6 @@
 %
 \chapter{NMPC}
 \input{chapters/NMPC}
-%
-\chapter{Simple Example}
-\input{chapters/simple}
 %
 \chapter{Numerical Case Study}
 \input{chapters/numerical}

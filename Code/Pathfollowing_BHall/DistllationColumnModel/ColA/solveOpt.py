@@ -13,16 +13,15 @@ from optProblem import *
 import time
 from nlp_solve import *
 
-def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1):
+def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1, params):
     
-    global ns
     x0_measure = z1
     x = zeros((N+1,84))
     x[0,:] = transpose(x0)
     for k in range(0,N):
         x[k+1,:] = transpose(x0)
 
-    J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, N, x0_measure)
+    J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, N, x0_measure, params)
 
     #Solving the NLP
     prob = {'f': J, 'x': vertcat(w),'g': vertcat(g)}
@@ -40,4 +39,6 @@ def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1)
     lam['lam_x'] = sol['lam_x']
     objVal = sol['f']
 
+    print sol
+    raw_input()
     return u, lam, lbw, ubw, objVal, params, elapsednlp

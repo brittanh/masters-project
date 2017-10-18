@@ -24,7 +24,7 @@ def pathfollowing(p_init, p_final, x_init, x_opt, y_init, lam_opt, mu_opt, case)
     y_list = array([])
     lam_list = array([])
     mu_list = array([])
-    iter = 0
+    iter = 1
     
     #appending initial values
     t_list = append(t_list, t)

@@ -75,6 +75,31 @@
     \field{year}{1998}
   \endentry
 
+  \entry{sensitivity}{book}{}
+    \name{author}{1}{}{%
+      {{hash=FAV}{%
+         family={Fiacco},
+         family_i={F\bibinitperiod},
+         given={Anthony\bibnamedelima V.},
+         given_i={A\bibinitperiod\bibinitdelim V\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {Academic Press}%
+    }
+    \strng{namehash}{FAV1}
+    \strng{fullhash}{FAV1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{F}
+    \field{sortinithash}{F}
+    \field{edition}{1st}
+    \field{title}{Introduction to Sensitivity and Stability Analysis in
+  Nonlinear Programming}
+    \field{volume}{165}
+    \field{year}{1983}
+  \endentry
+
   \entry{fast}{article}{}
     \name{author}{3}{}{%
       {{hash=JJ}{%

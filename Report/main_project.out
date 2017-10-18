@@ -8,15 +8,14 @@
 \BOOKMARK [1][-]{section.3.2}{Sensitivity-Based Path-Following NMPC}{chapter.3}% 8
 \BOOKMARK [2][-]{subsection.3.2.1}{Sensitivity Properties of NLP}{section.3.2}% 9
 \BOOKMARK [2][-]{subsection.3.2.2}{Path-Following Based on Sensitivity Properties}{section.3.2}% 10
-\BOOKMARK [2][-]{subsection.3.2.3}{Path-Following asNMPC}{section.3.2}% 11
-\BOOKMARK [0][-]{chapter.4}{Simple Example}{}% 12
-\BOOKMARK [0][-]{chapter.5}{Numerical Case Study}{}% 13
-\BOOKMARK [1][-]{section.5.1}{Process Description}{chapter.5}% 14
-\BOOKMARK [2][-]{subsection.5.1.1}{Model Equations}{section.5.1}% 15
-\BOOKMARK [2][-]{subsection.5.1.2}{Column data}{section.5.1}% 16
-\BOOKMARK [2][-]{subsection.5.1.3}{Detailed LV-model}{section.5.1}% 17
-\BOOKMARK [1][-]{section.5.2}{Objective Function and Constraints}{chapter.5}% 18
-\BOOKMARK [0][-]{chapter.6}{Results}{}% 19
-\BOOKMARK [1][-]{section.6.1}{Open-Loop Optimization}{chapter.6}% 20
-\BOOKMARK [0][-]{chapter.7}{Discussion}{}% 21
-\BOOKMARK [0][-]{chapter.8}{Conclusion}{}% 22
+\BOOKMARK [2][-]{subsection.3.2.3}{Path-Following asNMPC Approach}{section.3.2}% 11
+\BOOKMARK [0][-]{chapter.4}{Numerical Case Study}{}% 12
+\BOOKMARK [1][-]{section.4.1}{Process Description}{chapter.4}% 13
+\BOOKMARK [2][-]{subsection.4.1.1}{Model Equations}{section.4.1}% 14
+\BOOKMARK [2][-]{subsection.4.1.2}{Column data}{section.4.1}% 15
+\BOOKMARK [2][-]{subsection.4.1.3}{Detailed LV-model}{section.4.1}% 16
+\BOOKMARK [1][-]{section.4.2}{Objective Function and Constraints}{chapter.4}% 17
+\BOOKMARK [0][-]{chapter.5}{Results}{}% 18
+\BOOKMARK [1][-]{section.5.1}{Open-Loop Optimization}{chapter.5}% 19
+\BOOKMARK [0][-]{chapter.6}{Discussion}{}% 20
+\BOOKMARK [0][-]{chapter.7}{Conclusion}{}% 21

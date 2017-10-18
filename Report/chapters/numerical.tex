@@ -1,13 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Process Description}
-We now apply the path-following NMPC on a more relevant example, an isothermal reactor and separator process shown in Figure \ref{fig:process}.
+We now apply the path-following NMPC to a more relevant example: an isothermal reactor and separator process shown in Figure \ref{fig:process}.
 	\begin{figure}[H]
 		\centering
 		\includegraphics{process}
 		\caption{Diagram of a continuously-stirred tank reactor (CSTR) and distillation column.}
 		\label{fig:process}
 	\end{figure}
-The continuously-stirred tank reactor (CSTR) recieves a stream of pure component $\mathcal{A}$ and a recycle stream $\mathcal{R}$ from the distillation column.
+The continuously-stirred tank reactor (CSTR) receives a stream of pure component $\mathcal{A}$ and a recycle stream $\mathcal{R}$ from the distillation column.
 A first-order reaction ($\ce{\mathcal{A} -> \mathcal{B}}$) takes place in the CSTR and $\mathcal{B}$ is the desired product. 
 The product is then feed with a flow rate $F$ to the distillation column where the unreacted raw material is then separated from the product and recycled to the reactor.
 The desired product $\mathcal{B}$ is the bottom product and must have a certain purity.
@@ -107,7 +107,7 @@ The notation is outlined in Table \ref{tab:notation}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Column data}
 As mentioned above, the column has 41 stages including the reboiler and total condenser with the feed stage located at stage 21.
-The nominal steady state conditions for this column are summarized in Table \ref{tab: column_data}.
+The nominal steady state conditions for this column are summarized in Table \ref{tab:column_data}.
 \begin{table}[H]
 	\centering
 	\caption{Column data}
