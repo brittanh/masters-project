@@ -20,12 +20,17 @@ zF = array([[1.0],[0.0]])                      #Feed composition (# components)
 D = 0.5                                                    #Distillate flowrate
 B = 0.5                                                       #Bottoms flowrate
 qF = 1.0                                                  #Feed liquid fraction
-F_0 = 0.3                                                            #Feed rate
-F0 = F
+F_0 = 0.3                                                       #CSTR Feed rate
+F0 = F                                             #Nominal feed rate to column
 qF0 = qF
 alpha = 1.5                                                #Relative volatility
-Muw = 0.5                                               #Nominal liquid holdups
-
+#Nominal liquid holdups
+Muw = 0.5
+MO = zeros(NT+1)
+MO[0] = 0.5                                     #Nominal reboiler holdup [kmol]
+MO[1:NT-2] = 0.5                            #Nominal stage (tray) holdup [kmol]
+MO[NT-1] = 0.5                                 #Nominal condenser holdup [kmol]
+MO[NT] =0.5                                        #Nominal CSTR hold up [kmol]
 #Linearized flow dynamics (NA to reboiler and condenser)
 taul = 0.063                           #Time constant for liquid dynamics [min]
 L0 = 2.70629
@@ -70,7 +75,7 @@ params = {}
 params['dist'] = {'NC':NC,'F_0': F_0, 'NT': NT, 'zF': zF, 'qF': qF, 'NF': NF,
             'VB': VB, 'LT': LT, 'F': F, 'alpha': alpha, 'B': B, 'D': D, 'zF': zF,
             'Muw': Muw, 'L0': L0, 'L0b': L0b, 'qF0': qF0, 'F0': F0, 'taul': taul,
-                'V0':V0, 'lam':lam}
+                'V0':V0, 'lam':lam, 'MO': MO}
 params['cstr'] = {'k1': k1}
 params['price'] = {'pf': pf, 'pV': pV, 'pB': pV, 'pD': pD}
 params['bounds'] = {'x_min':x_min, 'x_max':x_max, 'lbu': lbu, 'ubu': ubu, 'lbx': lbx, 'ubx': ubx, 'ubg': ubg, 'lbg': lbg}

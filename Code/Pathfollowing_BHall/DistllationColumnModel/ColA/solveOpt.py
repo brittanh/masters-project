@@ -14,7 +14,7 @@ import time
 from nlp_solve import *
 from collections import *
 
-def solveOpt(optProblem, system, t0, x0, u0, N, T, iter, u_pf_opt, x_pf_opt, z1, params):
+def solveOpt(optProblem, x0, u0, N, z1, params):
     
     x0_measure = z1
     x = zeros((N+1,84))
@@ -37,8 +37,8 @@ def solveOpt(optProblem, system, t0, x0, u0, N, T, iter, u_pf_opt, x_pf_opt, z1,
     sol = nlp_solve(prob, options, W, lbw, ubw, lbg, ubg)
     toc = time.clock()
     elapsednlp = toc - tic
-    print("IPOPT solver run time = %f\n", elapsednlp)
-
+    print "IPOPT solver run time = %f\n" %elapsednlp
+ 
     u = sol['x']
     lam = {}
     lam['lam_g'] = sol['lam_g']

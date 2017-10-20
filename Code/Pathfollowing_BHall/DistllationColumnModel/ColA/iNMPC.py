@@ -9,9 +9,9 @@
 """
 from numpy import size, zeros, append
 import scipy.io as spio
-from system import *
 from compObjFn import *
 from solveOpt import *
+from plotStates import *
 
 def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     
@@ -31,7 +31,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     #NMPC iteration
     iter = 1
 
-    #loading in noise data
+    #Load in noise data
     data = spio.loadmat('noise1pct.mat', squeeze_me = True)
     noise = data['noise']
 
@@ -46,22 +46,20 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
             return t0, x0
         t0,x0 = measureInitVal(tmeasure, xmeasure)
 
-        #adding measurement noise
+        #Measurement noise
         n_M = noise[:,iter]                                       #Holdup noise
         n_X = zeros((NT+1,1))                              #Concentration noise
         measure_noise = append(n_M, n_X)
         x0_measure = x0 + measure_noise     #Adding measurement noise to states
 
         #advanced-step NMPC
-        primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, system, t0, x0, u0, N, T, iter, u_nlp_opt, x_nlp_opt, x0_measure, params)
+        primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, x0,
+                                                     u0, N, x0_measure, params)
 
-        raw_input()
         #Re-arrange NLP solutions
-        #turning vectors into matrices to make easier to plot
-        u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N)
-        print x_nlp_opt.shape
-        print x_nlp_opt[0,0]
-        raw_input()
+        #(turning vectors into matrices to make easier to plot)
+        u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N, nx, nu, ns, nk)
+
         #Save open loop solution for error computation
         z1 = x_nlp_opt[0:nx,4]
         #Record information
@@ -83,7 +81,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         
         x0 = xmeasure
         tmeasure, xmeasure = applyControl(system, T, t0, x0, u_nlp_opt)
-
+        raw_input()
         #Using actual state
         ObjVal = []
         ObjVal[iter] = compObjFn(u_nlp_opt[:,0], xmeasure)

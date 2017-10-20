@@ -54,10 +54,8 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         w['Uk_'+str(iter)] = Uk
         lbw = append(lbw,u_min)
         ubw = append(ubw,u_max)
-        indexU = iter*nk + (k+1)
+        indexU = iter*nk + k
         w0 = append(w0,u[:,indexU])
-        print 
-        raw_input()
         Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], Uk - u_opt)), (Uk - u_opt))
         
         #State at collocation points

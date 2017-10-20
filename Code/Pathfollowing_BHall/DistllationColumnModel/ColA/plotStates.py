@@ -1,7 +1,7 @@
 #!/opt/local/bin/python
 # -*- encoding: ascii -*-
 """
-    @purpose:
+    @purpose: Used to reshape the data to make it easier for plotting
     @author: Brittany Hall
     @date: 08.10.2017
     @version: 0.1
@@ -9,13 +9,14 @@
 """
 from numpy import array,zeros,reshape
 
-def plotStates(data, lb, ub, N):
-    global nk nx nu d ns
+def plotStates(data, lb, ub, N, nx, nu, ns, nk):
 
-    #optimized initial state
+    #Optimized initial state
     x0_opt = data[0:nx]
     data[0:nx] = array([])
     data = reshape(data, ((nu + (nx+ns)*d + (nx+ns)),N*nk))
+    print data.shape
+    raw_input()
     u_nlp_opt = data[0:nu,0:N*nk]
     data[0:nu,:] = array([])
 
