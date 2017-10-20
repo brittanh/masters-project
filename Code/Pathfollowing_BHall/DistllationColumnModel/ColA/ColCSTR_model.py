@@ -109,7 +109,7 @@ def ColCSTR_model(U,params):
     k1 = params['cstr']['k1']                           #Reaction rate constant
     dMdt[NT] = F_0 + D - F
     for j in range(0,NC-1):
-        dMxdt[NT,j] = F_0*zF0[j,1] + D*x[NT-1,j] - F*x[NT,j] - k1*M[NT]*x[NT,j]
+        dMxdt[NT,j] = F_0*zF0[j] + D*x[NT-1,j] - F*x[NT,j] - k1*M[NT]*x[NT,j]
 
     for i in range(0, NT+1):
         for j in range(0, NC-1):

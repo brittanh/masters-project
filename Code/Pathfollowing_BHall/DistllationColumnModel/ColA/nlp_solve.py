@@ -9,7 +9,7 @@
 """
 from casadi import *
 
-def nlp_solve(prob, options):
+def nlp_solve(prob, options, w0, lbw, ubw, lbg, ubg):
     """
     NLP solver for initial conditions to path-following algorithm
     """

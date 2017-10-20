@@ -12,8 +12,9 @@ from numpy import transpose, shape, zeros
 from optProblem import *
 import time
 from nlp_solve import *
+from collections import *
 
-def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1, params):
+def solveOpt(optProblem, system, t0, x0, u0, N, T, iter, u_pf_opt, x_pf_opt, z1, params):
     
     x0_measure = z1
     x = zeros((N+1,84))
@@ -21,17 +22,22 @@ def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1,
     for k in range(0,N):
         x[k+1,:] = transpose(x0)
 
-    J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, N, x0_measure, params)
+    J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, x0_measure, N, params)
 
     #Solving the NLP
-    prob = {'f': J, 'x': vertcat(w),'g': vertcat(g)}
+    keys = w.keys()
+    W = MX()
+    #concatenating w by each key such that it becomes an MX class
+    for i in keys:
+        W = vertcat(W,w[i])
+    prob = {'f': J, 'x': W,'g': vertcat(g)}
     options = {}
     tic = time.clock()
     startnlp = tic
-    sol = nlp_solve(prob, options)
+    sol = nlp_solve(prob, options, W, lbw, ubw, lbg, ubg)
     toc = time.clock()
     elapsednlp = toc - tic
-    print('IPOPT solver run time = %f\n', elapsednlp)
+    print("IPOPT solver run time = %f\n", elapsednlp)
 
     u = sol['x']
     lam = {}
@@ -39,6 +45,4 @@ def solveOpt(optProblem, system, N, t0, x0, u0, T, iter, u_pf_opt, x_pf_opt, z1,
     lam['lam_x'] = sol['lam_x']
     objVal = sol['f']
 
-    print sol
-    raw_input()
     return u, lam, lbw, ubw, objVal, params, elapsednlp

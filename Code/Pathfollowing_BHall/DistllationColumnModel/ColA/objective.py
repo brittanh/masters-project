@@ -11,19 +11,16 @@ from casadi import *
 from numpy import size, append, transpose
 import scipy.io as spio
 from distcolcstr_prob import itPredHor
-
-x =
-y =
-p =
-N =
+from params import *
 
 def objective(x,y,p,N):
+    
     nPrimal = size(x)
     nDual = size(y['lam_g'])
     nParam = size(p)
 
     #Model parameters
-    NT = 41                            #Number of stages in distillation column
+    NT = params['dist']['NT']          #Number of stages in distillation column
     Uf = 0.3                                             #Feed rate to CSTR F_0
     ~,state,xdot,inputs = ColCSTR_model(Uf)
     sf = Function('sf',[state,inputs],[xdot])
@@ -49,23 +46,10 @@ def objective(x,y,p,N):
     xf = Xinit[0:84]
     u_opt = Xinit[85:89]
 
-    #Prices
-    params = {}
-    params['price'] = {'pf': 1, 'pV': 0.02, 'pB': 2, 'pD': 0, 'F_0': Uf}
-
-    #Controller Gains, Nominal Holdups, Nominal flows
-    params['gains'] = {'KcB': 10, 'KcD': 10, 'MDs': 0.5, 'MBs': 0.5, 'Ds': 0.5, 'Bs': 0.5}
-
-    params['model'] = {'NT': NT, 'sf': sf, 'xdot_val_rf_ss': xf, 'x': x, 'u_opt': u_opt}
-
-    params['colloc'] = {'C': C, 'D': D, 'h': h}
-
-    params['weight'] = {'delta_time': delta_time, 'alpha': alpha, 'beta': beta, 'gamma': gamma}
-
-    #initial conditions
+    #Initial conditions
     X0 = MX.sym('X0', nx)
     V = append(V,X0)
-    cons = append(cons, X0 - x[0:nx,0)
+    cons = append(cons, X0 - x[0:nx,0])
     cons_x0 = X0 - x[0:nx,0]
 
    #Formulating the NLP
@@ -78,6 +62,7 @@ def objective(x,y,p,N):
                                
    V = vertcat(V[:])
    con = vertcat(cons[:])
+
    #Objective function and constraint functions
    f = Function('f', [V], [obj], chr('V'), chr('objective'))
    c = Function('c', [V], [cons], chr('V'), chr('constraint'))

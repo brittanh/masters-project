@@ -16,7 +16,7 @@ NF = 21                                                 #Location of feed stage
 LT = 2.827                                                              #Reflux
 VB = 3.454                                                              #Boilup
 F = 1.0                                                               #Feedrate
-zF = array([[1.0],[0.0]])                                     #Feed composition (size should match number of components)
+zF = array([[1.0],[0.0]])                      #Feed composition (# components)
 D = 0.5                                                    #Distillate flowrate
 B = 0.5                                                       #Bottoms flowrate
 qF = 1.0                                                  #Feed liquid fraction
@@ -25,6 +25,7 @@ F0 = F
 qF0 = qF
 alpha = 1.5                                                #Relative volatility
 Muw = 0.5                                               #Nominal liquid holdups
+
 #Linearized flow dynamics (NA to reboiler and condenser)
 taul = 0.063                           #Time constant for liquid dynamics [min]
 L0 = 2.70629
@@ -40,6 +41,15 @@ pf = 1
 pV = 0.02
 pB = 2
 pD = 0
+#Gains
+KcB = 10
+KcD = 10
+#Nominal values
+MDs = 0.5
+MBs = 0.5
+#Nominal flows
+Ds = 0.5
+Bs = 0.5
 #Constraint bounds
 lbu = array([[0.1], [0.1], [0.1], [0.1], [0.1]])
 ubu = array([[10],[4.008],[10],[1.0],[1.0]])
@@ -63,7 +73,7 @@ params['dist'] = {'NC':NC,'F_0': F_0, 'NT': NT, 'zF': zF, 'qF': qF, 'NF': NF,
                 'V0':V0, 'lam':lam}
 params['cstr'] = {'k1': k1}
 params['price'] = {'pf': pf, 'pV': pV, 'pB': pV, 'pD': pD}
-params['bounds'] = {'lbu': lbu, 'ubu': ubu, 'lbx': lbx, 'ubx': ubx,
-                'ubg': ubg, 'lbg': lbg}
+params['bounds'] = {'x_min':x_min, 'x_max':x_max, 'lbu': lbu, 'ubu': ubu, 'lbx': lbx, 'ubx': ubx, 'ubg': ubg, 'lbg': lbg}
+params['gain']={'MDs':MDs,'MBs':MBs,'Ds':Ds,'Bs':Bs, 'KcD':KcD, 'KcB':KcB}
 
 
