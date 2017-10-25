@@ -10,13 +10,12 @@
 from casadi import *
 from collocationSetup import *
 from ColCSTR_model import *
-from numpy import zeros, ones, array, transpose, append, matlib, tile
+from numpy import zeros, ones, array, transpose, matlib, tile
 import scipy.io as spio
 from itPredHorizon import *
 
 def optProblem(x, u, x0_measure, N, params):
     
-    global nx, nu, nk, d, tf, ns
     NT = params['dist']['NT']
     Uf = params['dist']['F_0']
     
@@ -27,8 +26,6 @@ def optProblem(x, u, x0_measure, N, params):
     #Unpacking parameters
     x_min = params['bounds']['x_min']
     x_max = params['bounds']['x_max']
-    u_min = params['bounds']['lbu']
-    u_max = params['bounds']['ubu']
 
     #Loading steady state data
     data = spio.loadmat('CstrDistXinit.mat', squeeze_me = True)
@@ -37,12 +34,12 @@ def optProblem(x, u, x0_measure, N, params):
     u_opt = Xinit[84:89]
 
     #Problem dimensions
-    nx = 2*NT+2                  #Number of states (CSTR + Distillation Column)
-    nu = 5                                  #Number of inputs (LT, VB, F, D, B)
-    nk = 1
-    tf = 1                                                               #[min]
-    h = tf/nk
-    ns = 0
+    nx = params['prob']['nx']    #Number of states (CSTR + Distillation Column)
+    nu = params['prob']['nu']               #Number of inputs (LT, VB, F, D, B)
+    nk = params['prob']['nk']
+    tf = params['prob']['tf']                                            #[min]
+    h =  params['prob']['h']
+    ns = params['prob']['ns']
 
     #Collecting model variables
     u = tile(u,nk)
@@ -55,7 +52,17 @@ def optProblem(x, u, x0_measure, N, params):
     #Collecting collocation variables
     colloc = {'C': C, 'D': D, 'h': h}
     params['colloc'] = colloc
-
+    
+    #Empty NLP
+    w = MX()                              #Decision variables (control + state)
+    w0 = array([])                                               #Initial guess
+    lbw = array([])                          #Lower bound for decision variable
+    ubw = array([])                          #Upper bound for decision variable
+    g = MX()                                              #Nonlinear constraint
+    lbg = array([])                       #Lower bound for nonlinear constraint
+    ubg = array([])                       #Upper bound for nonlinear constraint
+    J = 0                                                   #Objective function
+    
     delta_t = 1
     alpha = 1
     beta = 1
@@ -64,21 +71,19 @@ def optProblem(x, u, x0_measure, N, params):
     #Weight variables
     weight = {'delta_t': delta_t, 'alpha': alpha, 'beta': beta, 'gamma': gamma}
     params['weight'] = weight
-
+   
     #Initial conditions
-    X0 = MX.sym('X0', nx, 1)
-    w = {}                                 #Decision variables (control + state)
-    w['X0'] =  X0
-    lbw = x_min                             #Lower bound for decision variables
-    ubw = x_max                             #Upper bound for decision variables
-    w0 = x[0,0:nx]                                               #Initial guess
-    J = 0                                                   #Objective function
-    g = X0-x0_measure                                     #Nonlinear constraint
-    lbg = params['bounds']['lbg']         #Lower bound for nonlinear constraint
-    ubg = params['bounds']['ubg']         #Upper bound for nonlinear constraint
+    X0 = MX.sym('X0', nx)
+    w =  vertcat(w,X0)
+    lbw = append(lbw,x_min)
+    ubw = append(ubw,x_max)
+    w0 = append(w0, x[0,0:nx])
+    g = vertcat(g, X0-x0_measure)
+    lbg = append(lbg, params['bounds']['lbg'])
+    ubg = append(ubg, params['bounds']['ubg'])
 
+    #Formulating the NLP
     Xk = X0
-    
     data = spio.loadmat('Qmax.mat', squeeze_me = True)
     Qmax = data['Qmax']
     params['Qmax'] = Qmax
@@ -86,6 +91,6 @@ def optProblem(x, u, x0_measure, N, params):
     count = 2                                       #Counter for state variable
     ssoftc = 0
     for iter in range(0,N):
-      J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, nk, d, nu, nx)
+      J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d)
 
     return J, g, w0, w, lbg, ubg, lbw,ubw, params

@@ -11,13 +11,20 @@ from casadi import *
 from numpy import ones, zeros, multiply, append
 import scipy.io as spio
 
-def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, nk, d, nu, nx):
+def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d):
 
     #extracting parameter variables
+    nx = params['prob']['nx']    #Number of states (CSTR + Distillation Column)
+    nu = params['prob']['nu']               #Number of inputs (LT, VB, F, D, B)
+    nk = params['prob']['nk']
+    tf = params['prob']['tf']                                            #[min]
+    h =  params['prob']['h']
+    ns = params['prob']['ns']
+    
     x_min = params['bounds']['x_min']
     x_max = params['bounds']['x_max']
-    u_min = params['bounds']['lbu']
-    u_max = params['bounds']['ubu']
+    u_min = params['bounds']['u_min']
+    u_max = params['bounds']['u_max']
     
     NT = params['model']['NT']
     f = params['model']['f']
@@ -51,9 +58,10 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
     for k in range(0,nk):
         #New NLP variable for control
         Uk = MX.sym('U_'+str((iter)*nk+k),nu)
-        w['Uk_'+str(iter)] = Uk
+        w = vertcat(w,Uk)
         lbw = append(lbw,u_min)
         ubw = append(ubw,u_max)
+
         indexU = iter*nk + k
         w0 = append(w0,u[:,indexU])
         Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], Uk - u_opt)), (Uk - u_opt))
@@ -63,11 +71,12 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         Xkj = {}
         for j in range(0,d):
             Xkj[str(j)] = MX.sym('X_' + str((iter)*nk + k) +'_'+str(j+1), nx)
-            w['Xkj_' + str((iter)*nk+k) + '_' + str(j+1)] = Xkj[str(j)]
+            w = vertcat(w, Xkj[str(j)])
             lbw = append(lbw, x_min)
             ubw = append(ubw, x_max)
             w0 = append(w0, x[iter+1,:])
             count += 1
+
         #Loop over collocation points
         Xk_end = D[0] * Xk
         for j in range(0,d):
@@ -85,7 +94,7 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         
         #New NLP variable for state at end of interval
         Xk = MX.sym('X_'+ str((iter)*nk + k), nx)
-        w['Xk_'+ str((iter)*nk + k)] = Xk
+        w = vertcat(w, Xk)
         lbw = append(lbw, x_min)
         x_maxEnd = ones((2*NT+2,1))
         x_maxEnd[0,0] = 0.1
@@ -100,10 +109,10 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         lbg = append(lbg, zeros((nx,1)))
         ubg = append(ubg, zeros((nx,1)))
             
-        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] - pD*Uk[3])*delta_t
+        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] - pD*Uk[3]) * delta_t
         Jstate = mtimes(transpose(multiply(Qmax[0:nx],(Xk -xdot_val_rf_ss))),
                 (Xk - xdot_val_rf_ss))*delta_t
-        
+
         #Compute rotated cost function
         fm = f(Xk, Uk)
 

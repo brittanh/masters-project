@@ -47,18 +47,19 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         t0,x0 = measureInitVal(tmeasure, xmeasure)
 
         #Measurement noise
-        n_M = noise[:,iter]                                       #Holdup noise
+        n_M = noise[:,iter-1]                                     #Holdup noise
         n_X = zeros((NT+1,1))                              #Concentration noise
-        measure_noise = append(n_M, n_X)
+        measure_noise = append(n_X, n_M)
         x0_measure = x0 + measure_noise     #Adding measurement noise to states
 
-        #advanced-step NMPC
+        #Solving NLP
         primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, x0,
                                                      u0, N, x0_measure, params)
 
+        raw_input()
         #Re-arrange NLP solutions
         #(turning vectors into matrices to make easier to plot)
-        u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N, nx, nu, ns, nk)
+        u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N, params)
 
         #Save open loop solution for error computation
         z1 = x_nlp_opt[0:nx,4]
@@ -81,7 +82,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         
         x0 = xmeasure
         tmeasure, xmeasure = applyControl(system, T, t0, x0, u_nlp_opt)
-        raw_input()
+
         #Using actual state
         ObjVal = []
         ObjVal[iter] = compObjFn(u_nlp_opt[:,0], xmeasure)

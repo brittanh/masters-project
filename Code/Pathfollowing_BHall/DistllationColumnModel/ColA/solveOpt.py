@@ -8,7 +8,9 @@
     @updates:
 """
 from casadi import *
-from numpy import transpose, shape, zeros
+from numpy import transpose, shape, zeros, savetxt
+import numpy
+numpy.set_printoptions(threshold=numpy.nan)
 from optProblem import *
 import time
 from nlp_solve import *
@@ -22,23 +24,21 @@ def solveOpt(optProblem, x0, u0, N, z1, params):
     for k in range(0,N):
         x[k+1,:] = transpose(x0)
 
+
     J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, x0_measure, N, params)
 
     #Solving the NLP
-    keys = w.keys()
-    W = MX()
-    #concatenating w by each key such that it becomes an MX class
-    for i in keys:
-        W = vertcat(W,w[i])
-    prob = {'f': J, 'x': W,'g': vertcat(g)}
+    NLP = {'x': w, 'f': J, 'g': g}
     options = {}
     tic = time.clock()
     startnlp = tic
-    sol = nlp_solve(prob, options, W, lbw, ubw, lbg, ubg)
+    sol = nlp_solve(NLP, options, w0, lbw, ubw, lbg, ubg)
     toc = time.clock()
     elapsednlp = toc - tic
     print "IPOPT solver run time = %f\n" %elapsednlp
- 
+    #FIX STILL NOT SOLVING CORRECTLY
+    raw_input()
+
     u = sol['x']
     lam = {}
     lam['lam_g'] = sol['lam_g']

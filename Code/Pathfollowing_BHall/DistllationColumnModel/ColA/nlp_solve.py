@@ -9,11 +9,11 @@
 """
 from casadi import *
 
-def nlp_solve(prob, options, w0, lbw, ubw, lbg, ubg):
+def nlp_solve(problem, options, x0, lbx, ubx, lbg, ubg):
     """
     NLP solver for initial conditions to path-following algorithm
     """
     #Formulating NLP to solve
-    solver = nlpsol('solver', 'ipopt', prob, options)
-    sol = solver(x0 = w0, lbx = lbw, ubx = ubw, lbg=lbg, ubg=ubg)
+    solver = nlpsol('solver', 'ipopt', problem, options)
+    sol = solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
     return sol

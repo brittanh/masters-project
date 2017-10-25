@@ -37,6 +37,7 @@ L0 = 2.70629
 L0b = L0 + qF*F0                     #Nominal liquid flow below feed [kmol/min]
 lam = 0
 V0 = 3.206
+VB_max = 4.008
 #-------------------------CSTR parameters------------------------------------#
 #Reaction
 k1 = 34.1/60.0
@@ -49,27 +50,30 @@ pD = 0
 #Gains
 KcB = 10
 KcD = 10
-#Nominal values
+#Nominal holdup values
 MDs = 0.5
 MBs = 0.5
-#Nominal flows
+#Nominal flow rates
 Ds = 0.5
 Bs = 0.5
 #Constraint bounds
-lbu = array([[0.1], [0.1], [0.1], [0.1], [0.1]])
-ubu = array([[10],[4.008],[10],[1.0],[1.0]])
+u_min = array([[0.1], [0.1], [0.1], [0.1], [0.1]])
+u_max = array([[10],[VB_max],[10],[1.0],[1.0]])
 #State bounds
 x_min = zeros((2*NT+2,1))
 x_max = ones((2*NT+2,1))
-xB_max = 0.1
-x_max[0] = xB_max
-x_min[2*NT+1] = 0.3
-x_max[2*NT+1] = 0.7
-lbx = concatenate((x_min, lbu))
-ubx = concatenate((x_max, ubu))
+
+lbx = concatenate((x_min, u_min))
+ubx = concatenate((x_max, u_max))
 lbg = zeros((2*NT+2,1))
 ubg = zeros((2*NT+2,1))
-
+#Problem Dimensions
+nx = 2*NT+2                      #Number of states (CSTR + Distillation Column)
+nu = 5                                      #Number of inputs (LT, VB, F, D, B)
+nk = 1
+tf = 1
+h = tf/nk
+ns = 0
 #Collecting all parameters into a dictionary
 params = {}
 params['dist'] = {'NC':NC,'F_0': F_0, 'NT': NT, 'zF': zF, 'qF': qF, 'NF': NF,
@@ -77,8 +81,8 @@ params['dist'] = {'NC':NC,'F_0': F_0, 'NT': NT, 'zF': zF, 'qF': qF, 'NF': NF,
             'Muw': Muw, 'L0': L0, 'L0b': L0b, 'qF0': qF0, 'F0': F0, 'taul': taul,
                 'V0':V0, 'lam':lam, 'MO': MO}
 params['cstr'] = {'k1': k1}
-params['price'] = {'pf': pf, 'pV': pV, 'pB': pV, 'pD': pD}
-params['bounds'] = {'x_min':x_min, 'x_max':x_max, 'lbu': lbu, 'ubu': ubu, 'lbx': lbx, 'ubx': ubx, 'ubg': ubg, 'lbg': lbg}
-params['gain']={'MDs':MDs,'MBs':MBs,'Ds':Ds,'Bs':Bs, 'KcD':KcD, 'KcB':KcB}
-
+params['price'] = {'pf': pf, 'pV': pV, 'pB': pB, 'pD': pD}
+params['bounds'] = {'x_min':x_min, 'x_max':x_max, 'u_min': u_min, 'u_max': u_max, 'lbx': lbx, 'ubx': ubx, 'ubg': ubg, 'lbg': lbg}
+params['gain'] = {'MDs':MDs,'MBs':MBs,'Ds':Ds,'Bs':Bs, 'KcD':KcD, 'KcB':KcB}
+params['prob'] = {'nx':nx, 'nu':nu, 'nk':nk, 'tf': tf, 'h': h, 'ns':ns}
 

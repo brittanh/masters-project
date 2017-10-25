@@ -7,18 +7,25 @@
     @version: 0.1
     @updates:
 """
-from numpy import array,zeros,reshape
+from numpy import array, zeros, reshape
+from casadi import *
 
-def plotStates(data, lb, ub, N, nx, nu, ns, nk):
-
+def plotStates(data, lb, ub, N, params):
+    #unpacking params
+    nu = params['prob']['nu']
+    nx = params['prob']['nx']
+    ns = params['prob']['ns']
+    nk = params['prob']['nk']
+    
     #Optimized initial state
     x0_opt = data[0:nx]
-    data[0:nx] = array([])
-    data = reshape(data, ((nu + (nx+ns)*d + (nx+ns)),N*nk))
+    data = data[nx-1:-1]
     print data.shape
+    print data
     raw_input()
+    data = reshape(data, ((nu + (nx+ns)*d + (nx+ns)),N*nk))
     u_nlp_opt = data[0:nu,0:N*nk]
-    data[0:nu,:] = array([])
+    data = data[nu-1:-1]
 
     lb0 = lb[0:nx+ns]
     lb[0:nx] = array([])
