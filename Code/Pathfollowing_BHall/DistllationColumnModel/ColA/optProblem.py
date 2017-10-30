@@ -7,10 +7,10 @@
     @version: 0.1
     @updates:
 """
-from casadi import *
+from casadi import Function, MX, SX, vertcat
 from collocationSetup import *
 from ColCSTR_model import *
-from numpy import zeros, ones, array, transpose, matlib, tile
+from numpy import zeros, ones, array, transpose, matlib, tile, reshape, shape, savetxt
 import scipy.io as spio
 from itPredHorizon import *
 
@@ -55,12 +55,12 @@ def optProblem(x, u, x0_measure, N, params):
     
     #Empty NLP
     w = MX()                              #Decision variables (control + state)
-    w0 = array([])                                               #Initial guess
-    lbw = array([])                          #Lower bound for decision variable
-    ubw = array([])                          #Upper bound for decision variable
+    w0 = []                                                      #Initial guess
+    lbw = []                                 #Lower bound for decision variable
+    ubw = []                                 #Upper bound for decision variable
     g = MX()                                              #Nonlinear constraint
-    lbg = array([])                       #Lower bound for nonlinear constraint
-    ubg = array([])                       #Upper bound for nonlinear constraint
+    lbg = []                              #Lower bound for nonlinear constraint
+    ubg = []                              #Upper bound for nonlinear constraint
     J = 0                                                   #Objective function
     
     delta_t = 1
@@ -75,12 +75,13 @@ def optProblem(x, u, x0_measure, N, params):
     #Initial conditions
     X0 = MX.sym('X0', nx)
     w =  vertcat(w,X0)
-    lbw = append(lbw,x_min)
-    ubw = append(ubw,x_max)
-    w0 = append(w0, x[0,0:nx])
+    w0 = [i for i in x[0,0:nx]]
+    lbw = [i for i in x_min]
+    ubw = [i for i in x_max]
+    
     g = vertcat(g, X0-x0_measure)
-    lbg = append(lbg, params['bounds']['lbg'])
-    ubg = append(ubg, params['bounds']['ubg'])
+    lbg = params['bounds']['lbg']
+    ubg = params['bounds']['ubg']
 
     #Formulating the NLP
     Xk = X0
@@ -91,6 +92,10 @@ def optProblem(x, u, x0_measure, N, params):
     count = 2                                       #Counter for state variable
     ssoftc = 0
     for iter in range(0,N):
-      J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d)
+        J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d)
 
-    return J, g, w0, w, lbg, ubg, lbw,ubw, params
+    savetxt('lbg_py.txt', lbg)
+
+    raw_input()
+
+    return J, g, w0, w, lbg, ubg, lbw, ubw, params

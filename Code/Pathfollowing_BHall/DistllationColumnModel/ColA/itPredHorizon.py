@@ -6,13 +6,13 @@
     @date: 07.10.2017
     @version: 0.1
     @updates:
-"""
+    """
 from casadi import *
 from numpy import ones, zeros, multiply, append
 import scipy.io as spio
 
 def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d):
-
+    
     #extracting parameter variables
     nx = params['prob']['nx']    #Number of states (CSTR + Distillation Column)
     nu = params['prob']['nu']               #Number of inputs (LT, VB, F, D, B)
@@ -54,14 +54,14 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
     beta = params['weight']['beta']
     gamma = params['weight']['gamma']
     Qmax = params['Qmax']
-
+    
     for k in range(0,nk):
         #New NLP variable for control
         Uk = MX.sym('U_'+str((iter)*nk+k),nu)
         w = vertcat(w,Uk)
         lbw = append(lbw,u_min)
         ubw = append(ubw,u_max)
-
+        
         indexU = iter*nk + k
         w0 = append(w0,u[:,indexU])
         Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], Uk - u_opt)), (Uk - u_opt))
@@ -76,14 +76,14 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
             ubw = append(ubw, x_max)
             w0 = append(w0, x[iter+1,:])
             count += 1
-
+    
         #Loop over collocation points
         Xk_end = D[0] * Xk
         for j in range(0,d):
             xp = C[0,j+1] * Xk
             for r in range(0,d):
                 xp = xp + C[r+1,j+1] * Xkj[str(r)]
- 
+            
             #Append collocation equations
             fj = f(Xkj[str(j)],Uk)
             g = vertcat(g, h*fj-xp)
@@ -103,25 +103,24 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         w0 = append(w0, x[iter+1,:])
         w0 = w0.reshape(len(w0),1)
         count += 1
-            
+        
         #Add equality constraint
         g = vertcat(g, Xk_end-Xk)
         lbg = append(lbg, zeros((nx,1)))
         ubg = append(ubg, zeros((nx,1)))
-            
+        
         Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] - pD*Uk[3]) * delta_t
         Jstate = mtimes(transpose(multiply(Qmax[0:nx],(Xk -xdot_val_rf_ss))),
-                (Xk - xdot_val_rf_ss))*delta_t
-
+                        (Xk - xdot_val_rf_ss))*delta_t
+            
         #Compute rotated cost function
         fm = f(Xk, Uk)
-
+                        
         #Load Lagrange multipliers from steady-state optimization
         data = spio.loadmat('LamdaCstrDist.mat', squeeze_me = True)
         lam = data['lamda']
         Jmodel = lam*fm
-        
+                        
         J = J + alpha*Jcontrol + gamma*Jstate + beta*Jecon
-    
-    return J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc
 
+    return J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc

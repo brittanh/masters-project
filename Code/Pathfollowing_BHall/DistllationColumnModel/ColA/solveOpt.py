@@ -24,7 +24,6 @@ def solveOpt(optProblem, x0, u0, N, z1, params):
     for k in range(0,N):
         x[k+1,:] = transpose(x0)
 
-
     J, g, w0, w, lbg, ubg, lbw, ubw, params = optProblem(x, u0, x0_measure, N, params)
 
     #Solving the NLP
@@ -36,7 +35,6 @@ def solveOpt(optProblem, x0, u0, N, z1, params):
     toc = time.clock()
     elapsednlp = toc - tic
     print "IPOPT solver run time = %f\n" %elapsednlp
-    #FIX STILL NOT SOLVING CORRECTLY
     raw_input()
 
     u = sol['x']
