@@ -35,7 +35,6 @@ def solveOpt(optProblem, x0, u0, N, z1, params):
     toc = time.clock()
     elapsednlp = toc - tic
     print "IPOPT solver run time = %f\n" %elapsednlp
-    raw_input()
 
     u = sol['x']
     lam = {}

@@ -6,9 +6,9 @@
     a reboiler (stage 1) plus a total condenser (stage NT).
     The model is based on column A in Skogestad and Postlethwaite (1996).
     @author: Brittany Hall
-    @date: 06.10.2017
-    @version: 0.1
-    @updates:
+    @date: 31.10.2017
+    @version: 0.2
+    @updates: Fixed bug errors on index assignments
 """
 from casadi import *
 from numpy import array, Infinity
@@ -71,12 +71,12 @@ def ColCSTR_model(U,params):
 
     #Liquid flows (Wier formula)
     Li[0] = float('Inf')
-
     for i in range(1,NT):
-        if i <= NF:
+        if i <= NF-1:
             Li[i] = L0b + (M[i]-Muw)/taul
         else:
             Li[i] = L0 + (M[i]-Muw)/taul
+
     #Top tray liquid
     Li[NT-1] = L_T
 
@@ -84,17 +84,17 @@ def ColCSTR_model(U,params):
     for i in range(0,NT-1):
         for j in range(0,NC-1):
             y[i,j] = (x[i,j]*alpha)/(1+(alpha-1)*x[i,j])
+
     #Partial Reboiler
     dMdt[0] = Li[1] - Vi[0] - B
     for i in range(0,NC-1):
-        dMxdt[0,i] = Li[1]*x[1,i] - Vi[0]*y[1,i] - B*x[0,j]
+        dMxdt[0,i] = Li[1]*x[1,i] - Vi[0]*y[0,i] - B*x[0,j]
 
     #Stripping and Enrichment sections
     for i in range(1,NT-1):
         dMdt[i] = Li[i+1] - Li[i] + Vi[i-1]-Vi[i]
         for j in range(0,NC-1):
             dMxdt[i,j] = Li[i+1]*x[i+1,j] - Li[i]*x[i,j] + Vi[i-1]*y[i-1,j] -Vi[i]*y[i,j]
-
     #Correction for feed stage
     dMdt[NF-1] = dMdt[NF-1] + F
     for j in range(0, NC-1):

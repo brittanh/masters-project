@@ -11,6 +11,8 @@
 """
 from numpy import *
 from col_cstr_model import *
+from params import *
+from system import system
 
 def col_cstr_LV(t, X):
     """
@@ -19,15 +21,18 @@ def col_cstr_LV(t, X):
                 These inputs are set by altering col_LV.py file.
         Outputs-x - liquid coposition and hold up for stages 1 to NT
     """
-    NT = 41                            #Number of stages in distillation column
-
-    LT = uc[0]
+    NT = params['dist']['NT']          #Number of stages in distillation column
+    print system()
+    raw_input()
+    LT = system.uc[0]
+    print LT
+    raw_input()
     VB = uc[1]
     F = uc[2]
     D = uc[3]
     B = uc[4]
-    F_0 = 0.3                                                    #CSTR feedrate
-    zF = 1.0                                              #Feed composition [A]
+    F_0 = params['dist']['F_0']                                  #CSTR feedrate
+    zF = params['dist']['zF'][0]                          #Feed composition [A]
 
     #Collecting inputs and disturbances
     u_all = append(LT,VB)

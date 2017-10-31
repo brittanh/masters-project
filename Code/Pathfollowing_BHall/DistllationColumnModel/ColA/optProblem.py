@@ -42,12 +42,13 @@ def optProblem(x, u, x0_measure, N, params):
     ns = params['prob']['ns']
 
     #Collecting model variables
-    u = tile(u,nk)
+    u = tile(u,nk)                                              #Duplicating u0
     model = {'NT': NT, 'f': f, 'xdot_val_rf_ss': xf, 'x': x, 'u_opt': u_opt, 'u':u}
     params['model'] = model
 
     #Preparing collocation matrices
     _, C, D, d = collocationSetup() #function from casadi
+    params['prob']['d'] = d                             #Adding d to parameters
 
     #Collecting collocation variables
     colloc = {'C': C, 'D': D, 'h': h}
@@ -61,14 +62,13 @@ def optProblem(x, u, x0_measure, N, params):
     g = MX()                                              #Nonlinear constraint
     lbg = []                              #Lower bound for nonlinear constraint
     ubg = []                              #Upper bound for nonlinear constraint
-    J = 0                                                   #Objective function
+    J = 0                                        #Initialize objective function
     
+    #Weight variables
     delta_t = 1
     alpha = 1
     beta = 1
     gamma = 1
-
-    #Weight variables
     weight = {'delta_t': delta_t, 'alpha': alpha, 'beta': beta, 'gamma': gamma}
     params['weight'] = weight
    
@@ -78,12 +78,10 @@ def optProblem(x, u, x0_measure, N, params):
     w0 = [i for i in x[0,0:nx]]
     lbw = [i for i in x_min]
     ubw = [i for i in x_max]
-    
     g = vertcat(g, X0-x0_measure)
     lbg = params['bounds']['lbg']
     ubg = params['bounds']['ubg']
 
-    #Formulating the NLP
     Xk = X0
     data = spio.loadmat('Qmax.mat', squeeze_me = True)
     Qmax = data['Qmax']
@@ -93,9 +91,5 @@ def optProblem(x, u, x0_measure, N, params):
     ssoftc = 0
     for iter in range(0,N):
         J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d)
-
-    savetxt('lbg_py.txt', lbg)
-
-    raw_input()
 
     return J, g, w0, w, lbg, ubg, lbw, ubw, params

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  30 OCT 2017 12:00
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  31 OCT 2017 18:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1411,7 +1411,10 @@ File: listings.cfg 2015/06/04 1.6 listings configuration
 ))
 Package: listings 2015/06/04 1.6 (Carsten Heinz)
 
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/lstlang1.sty
+(/usr/local/texlive/2016/texmf-dist/tex/latex/beamer/multimedia/multimedia.sty
+Package: multimedia 2012/05/02 ver 0.02
+\mm@movie=\count195
+) (/usr/local/texlive/2016/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2015/06/04 1.6 listings language file
 )
 (./presentation_BHall.aux)
@@ -1468,16 +1471,16 @@ LaTeX Font Info:    ... okay on input line 43.
 
 (/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count195
+\scratchcounter=\count196
 \scratchdimen=\dimen295
 \scratchbox=\box71
-\nofMPsegments=\count196
-\nofMParguments=\count197
+\nofMPsegments=\count197
+\nofMParguments=\count198
 \everyMPshowfont=\toks46
-\MPscratchCnt=\count198
+\MPscratchCnt=\count199
 \MPscratchDim=\dimen296
-\MPnumerator=\count199
-\makeMPintoPDFobject=\count266
+\MPnumerator=\count266
+\makeMPintoPDFobject=\count267
 \everyMPtoPDFconversion=\toks47
 ) (/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -1504,7 +1507,7 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count267
+\c@section@level=\count268
 )
 LaTeX Info: Redefining \ref on input line 43.
 LaTeX Info: Redefining \pageref on input line 43.
@@ -1595,7 +1598,7 @@ LaTeX Info: Redefining \includegraphics on input line 43.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count268
+\c@lstlisting=\count269
 
 (./presentation_BHall.nav) <images/ntnu.png, id=20, 529.98pt x 189.70876pt>
 File: images/ntnu.png Graphic file (type png)
@@ -1611,51 +1614,60 @@ LaTeX Font Warning: Font shape `OT1/cmss/m/n' in size <4> not available
 [1
 
 {/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./image
-s/ntnu.png>] [2
-
-]
-LaTeX Font Info:    Try loading font information for U+msa on input line 70.
-
-(/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
+s/ntnu.png>]
+LaTeX Font Info:    Try loading font information for U+msa on input line 63.
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 70.
+LaTeX Font Info:    Try loading font information for U+msb on input line 63.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Try loading font information for OT1+mathkerncmss on input 
-line 70.
+line 63.
 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/sansmathaccent/ot1mathkerncmss.fd
 File: ot1mathkerncmss.fd 2013/03/27 Fontinst v1.933 font definitions for OT1/ma
 thkerncmss.
-)
-Package epstopdf Info: Source file: <images/x1_2.eps>
-(epstopdf)                    date: 2017-10-17 10:00:57
-(epstopdf)                    size: 22835 bytes
-(epstopdf)             Output file: <images/x1_2-eps-converted-to.pdf>
-(epstopdf)                    date: 2017-10-30 11:56:31
-(epstopdf)                    size: 16058 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/x1_2-eps-converted-
-to.pdf images/x1_2.eps>
-(epstopdf)             \includegraphics on input line 70.
-Package epstopdf Info: Output file is already uptodate.
- <images/x1_2-eps-converted-to.pdf, id=80, 462.72874pt x 346.29375pt>
-File: images/x1_2-eps-converted-to.pdf Graphic file (type pdf)
+) <images/contour_p0.png, id=54, 462.528pt x 346.896pt>
+File: images/contour_p0.png Graphic file (type png)
 
-<use images/x1_2-eps-converted-to.pdf>
-Package pdftex.def Info: images/x1_2-eps-converted-to.pdf used on input line 70
-.
-(pdftex.def)             Requested size: 185.08821pt x 138.51503pt.
+<use images/contour_p0.png>
+Package pdftex.def Info: images/contour_p0.png used on input line 63.
+(pdftex.def)             Requested size: 171.14764pt x 128.36009pt.
+ [2
 
-Overfull \hbox (13.94057pt too wide) in paragraph at lines 70--70
+ <./images/contour_p0.png>]
+<images/process.png, id=89, 316.18124pt x 226.8475pt>
+File: images/process.png Graphic file (type png)
+ <use images/process.png>
+Package pdftex.def Info: images/process.png used on input line 81.
+(pdftex.def)             Requested size: 189.7102pt x 136.10954pt.
+
+Overfull \hbox (18.56256pt too wide) in paragraph at lines 81--81
  [] 
  []
 
-[3
+<images/NMPC.png, id=90, 562.1pt x 266.9975pt>
+File: images/NMPC.png Graphic file (type png)
+ <use images/NMPC.png>
+Package pdftex.def Info: images/NMPC.png used on input line 81.
+(pdftex.def)             Requested size: 168.6313pt x 80.09985pt.
+ [3
 
- <./images/x1_2-eps-converted-to.pdf>]
+ <./images/process.png> <./images/NMPC.png>] [4
+
+]
+<images/pf_algo.png, id=143, 812.03375pt x 570.13pt>
+File: images/pf_algo.png Graphic file (type png)
+ <use images/pf_algo.png>
+Package pdftex.def Info: images/pf_algo.png used on input line 91.
+(pdftex.def)             Requested size: 284.21606pt x 199.5485pt.
+
+[5
+
+ <./images/pf_algo.png>]
 \tf@nav=\write6
 \openout6 = `presentation_BHall.nav'.
 
@@ -1665,11 +1677,11 @@ Overfull \hbox (13.94057pt too wide) in paragraph at lines 70--70
 \tf@snm=\write8
 \openout8 = `presentation_BHall.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 71.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 71.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 92.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 92.
  (./presentation_BHall.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 71.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 71.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 92.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 92.
 Package rerunfilecheck Info: File `presentation_BHall.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
@@ -1677,16 +1689,16 @@ Package rerunfilecheck Info: File `presentation_BHall.out' has not changed.
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.0pt have occurred.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 71.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 92.
  ) 
 Here is how much of TeX's memory you used:
- 27489 strings out of 493014
- 525165 string characters out of 6133351
- 588333 words of memory out of 5000000
- 30517 multiletter control sequences out of 15000+600000
- 12030 words of font info for 44 fonts, out of 8000000 for 9000
+ 27586 strings out of 493014
+ 527041 string characters out of 6133351
+ 592889 words of memory out of 5000000
+ 30615 multiletter control sequences out of 15000+600000
+ 10990 words of font info for 40 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,20n,55p,10411b,669s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 56i,21n,55p,10411b,673s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 ></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
 /usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></
@@ -1697,10 +1709,10 @@ sr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr
 local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/l
 ocal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/loc
 al/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on presentation_BHall.pdf (3 pages, 144416 bytes).
+Output written on presentation_BHall.pdf (5 pages, 343133 bytes).
 PDF statistics:
- 179 PDF objects out of 1000 (max. 8388607)
- 126 compressed objects within 2 object streams
- 7 named destinations out of 1000 (max. 500000)
- 71 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 205 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
+ 11 named destinations out of 1000 (max. 500000)
+ 90 words of extra memory for PDF output out of 10000 (max. 10000000)
 

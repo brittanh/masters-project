@@ -122,5 +122,5 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         Jmodel = lam*fm
                         
         J = J + alpha*Jcontrol + gamma*Jstate + beta*Jecon
-
+    
     return J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc

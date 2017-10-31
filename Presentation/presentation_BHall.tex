@@ -6,7 +6,7 @@
 \usepackage{caption}
 \captionsetup{font=scriptsize,labelfont=scriptsize}
 \usepackage{listings}
-
+\usepackage{multimedia}
 \graphicspath{{images/}}
 \setbeamertemplate{footline}
 {
@@ -16,7 +16,7 @@
     \usebeamerfont{author in head/foot}\insertshortauthor
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
-    \usebeamerfont{title in head/foot}\insertshorttitle\hspace*{3em}
+    %\usebeamerfont{title in head/foot}\insertshorttitle\hspace*{3em}
     \insertframenumber{} / \inserttotalframenumber\hspace*{1ex}
   \end{beamercolorbox}}%
   \vskip0pt%
@@ -34,7 +34,7 @@ showstringspaces=false}
 
 
 %Information to be included in the title page:
-\title{Path-following, economic nonlinear model predictive control in Python}
+\title{Sensitivity-Based Economic NMPC with a Path-Following Approach in Python}
 \author{Brittany Hall}
 \institute{Norwegian University of Science and Technology (NTNU)}
 \date{01.11.2017}
@@ -43,29 +43,50 @@ showstringspaces=false}
 \begin{document}
 
 \frame{\titlepage}
-%SLIDE 
-
-\begin{frame}{Path-following Algorithm}
-
-\end{frame}
 
 %SLIDE 
 \begin{frame}{Simple Example Problem}
 \begin{columns}
 \begin{column}{0.5\textwidth}
-	\begin{mini}
+	\begin{mini*}
 		{x\in\mathbb{R}^2}{p_1x_1^3+x_2^2}{}{}
 		\addConstraint{x_2-e^{-x_1}\geq0}{}{}
 		\addConstraint{x_1\geq p_2}{}{}
-	\end{mini}
+	\end{mini*}
+	Use approximate solution $x_0 = (0.5,0.6)$ with $p_0=(1,-4)$ to trace a path to find an approximate solution for $p_f=(8,1)$.
 \end{column}
 \begin{column}{0.5\textwidth}
-\begin{figure}
 	\centering
-	\includegraphics[scale=0.4]{x1_2}
-	\caption{Illustration of how $x_1$ changes over time using the path following algorithm}
-\end{figure}
+	\movie[label=false,width=1\textwidth,poster,open,showcontrols]{\includegraphics[width=\textwidth]{contour_p0.png}}{contour_plots.avi}
 \end{column}
 \end{columns}
+\end{frame}
+%SLIDE
+\begin{frame}{CSTR + Distillation Column System}
+	\begin{columns}
+		\begin{column}{0.5\textwidth}
+			\begin{figure}[H]
+				\includegraphics[scale=0.6]{process}
+				\caption{CSTR + Distillation column}
+			\end{figure}
+		\end{column}
+		\begin{column}{0.5\textwidth}
+			\begin{figure}[H]
+				\centering
+				\includegraphics[scale=0.3]{NMPC}
+			\end{figure}
+			
+		\end{column}
+	\end{columns}
+\end{frame}
+%SLIDE
+\begin{frame}
+Back Up Slides
+\end{frame}
+%SLIDE
+\begin{frame}{Path-following algorithm}
+	\begin{figure}[H]
+		\includegraphics[scale=0.35]{pf_algo}
+	\end{figure}
 \end{frame}
 \end{document}

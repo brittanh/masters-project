@@ -35,7 +35,7 @@ def pathfollowing(p_init, p_final, x_init, x_opt, y_init, lam_opt, mu_opt, case)
     
     #initial algorithm parameters
     
-    delta_t = 0.01                                                  #t step size
+    delta_t = 0.1                                                 #t step size
     N = int(1/delta_t)                                    #number of iterations
     alpha1 = 0.25
     p = zeros((N+1,2))

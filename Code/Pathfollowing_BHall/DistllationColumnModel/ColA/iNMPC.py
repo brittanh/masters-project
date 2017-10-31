@@ -56,7 +56,6 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         primalNLP, _, lb, ub, _, params, elapsedtime = solveOpt(optProblem, x0,
                                                      u0, N, x0_measure, params)
 
-        raw_input()
         #Re-arrange NLP solutions
         #(turning vectors into matrices to make easier to plot)
         u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N, params)
@@ -82,6 +81,8 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         
         x0 = xmeasure
         tmeasure, xmeasure = applyControl(system, T, t0, x0, u_nlp_opt)
+        print xmeasure
+        raw_input()
 
         #Using actual state
         ObjVal = []
