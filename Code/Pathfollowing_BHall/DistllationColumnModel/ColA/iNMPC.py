@@ -7,11 +7,12 @@
     @version: 0.1
     @updates:
 """
-from numpy import size, zeros, append
+from numpy import size, zeros, append, hstack, vstack, reshape, savetxt
 import scipy.io as spio
 from compObjFn import *
 from solveOpt import *
 from plotStates import *
+from scipy.io import savemat
 
 def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     
@@ -22,8 +23,12 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     Tall = []
     Xall = zeros((MPCit, size(xmeasure, axis = 0)))
     Uall = zeros((MPCit, size(u0, axis = 0)))
+    ObjVal = {}
+    ObjVal['econ'] = []
+    ObjVal['reg'] = []
     xmeasureAll = []
     uAll = []
+    xAll = []
     runtime = []
     u_nlp_opt = []
     x_nlp_opt = []
@@ -64,43 +69,62 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         z1 = x_nlp_opt[0:nx,4]
         #Record information
         Tall = append(Tall, t0)
-        Xall[iter+1,:] = transpose(x0)
-        Uall[iter+1,:] = u0[:,0]
+        Xall[iter-1,:] = transpose(x0)
+        Uall[iter-1,:] = u0[:,0]
 
         #Applying control to process with optimized control
         def dynamic(system, T, t0, x0, u0):
             x = system(t0, x0, u0, T)
             x_intermediate = append(x0, x)
-            t_intermediate = append(t0, t0+T)
+            t_intermediate = hstack([t0, t0+T])
             return x, t_intermediate, x_intermediate
         
         def applyControl(system, T, t0, x0, u0):
-            xapplied = dynamic(system, T, t0, x0, u0[:,0])
+            xapplied, _, _ = dynamic(system, T, t0, x0, u0[:,0])
             tapplied = t0 + T
-            return xapplied, tapplied
+            return tapplied, xapplied
         
-        x0 = xmeasure
+        #Apply control to process with optimized control from path-following algorithm
+        x0 = xmeasure                                          #From online step
         tmeasure, xmeasure = applyControl(system, T, t0, x0, u_nlp_opt)
-        print xmeasure
-        raw_input()
 
         #Using actual state
-        ObjVal = []
-        ObjVal[iter] = compObjFn(u_nlp_opt[:,0], xmeasure)
+        Jobj = compObjFn(u_nlp_opt[:,0], xmeasure)
 
         #Storing Output Variables
+        ObjVal['econ'].append(float(Jobj['econ'][0]))
+        ObjVal['reg'].append(float(Jobj['reg'][0]))
         xmeasureAll = append(xmeasureAll, xmeasure)
         uAll = append(uAll, u_nlp_opt[:,0])
         runtime = append(runtime, elapsedtime)
-
-        def shiftHorizon(uopt):
-            u0 = [u[:,1:size(u,axis = 1)], u[:,size(u,axis = 1)] ]
+        
+        def shiftHorizon(u):
+            u0 = hstack((u[:,1:u.shape[1]], u[:,u.shape[1]-1]))
             return u0
 
         u0 = shiftHorizon(u_nlp_opt)
 
         iter += 1
-            
-    xmeasureAll = xmeasureAll.setshape(84, mpciterations)
     
+    xmeasureAll = reshape(xmeasureAll,(2*NT+2, MPCit))
+    for i in range(0,xmeasureAll.shape[1]):
+        xAll.concatenate(xAll,xmeasureAll[:,i])
+        print xAll
+        raw_input()
+    print xmeasureAll[0:,0:]
+    print type(xmeasureAll)
+    raw_input()
+    
+    ideal = {
+            'ideal':{
+                'xmeasureAll': xmeasureAll,
+                'uAll': uAll,
+                'ObjReg': array(ObjVal.values()[0]),
+                'ObjEcon': array(ObjVal.values()[0])
+                }
+    }
+    print ideal
+    raw_input()
+    savemat('iNMPC.mat',ideal)  #saving iNMPC results to compare with pfNMPC
+    raw_input()
     return Tall, xmeasureAll, uAll, ObjVal, primalNLP, params, runtime

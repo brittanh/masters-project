@@ -28,9 +28,9 @@ alpha = 1.5                                                #Relative volatility
 Muw = 0.5
 MO = zeros(NT+1)
 MO[0] = 0.5                                     #Nominal reboiler holdup [kmol]
-MO[1:NT-2] = 0.5                            #Nominal stage (tray) holdup [kmol]
+MO[1:NT-1] = 0.5                            #Nominal stage (tray) holdup [kmol]
 MO[NT-1] = 0.5                                 #Nominal condenser holdup [kmol]
-MO[NT] =0.5                                        #Nominal CSTR hold up [kmol]
+MO[NT] = 0.5                                        #Nominal CSTR hold up [kmol]
 #Linearized flow dynamics (NA to reboiler and condenser)
 taul = 0.063                           #Time constant for liquid dynamics [min]
 L0 = 2.70629

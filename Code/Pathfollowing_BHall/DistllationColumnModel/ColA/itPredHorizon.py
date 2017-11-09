@@ -117,9 +117,9 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         fm = f(Xk, Uk)
                         
         #Load Lagrange multipliers from steady-state optimization
-        data = spio.loadmat('LamdaCstrDist.mat', squeeze_me = True)
-        lam = data['lamda']
-        Jmodel = lam*fm
+#        data = spio.loadmat('LamdaCstrDist.mat', squeeze_me = True)
+#        lam = data['lamda']
+#        Jmodel = lam*fm
                         
         J = J + alpha*Jcontrol + gamma*Jstate + beta*Jecon
     
