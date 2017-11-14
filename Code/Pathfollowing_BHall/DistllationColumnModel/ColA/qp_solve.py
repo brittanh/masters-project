@@ -7,167 +7,70 @@
     @version: 0.1
     @updates:
 """
-from numpy import *
+from numpy import where, multiply
 from casadi import *
-from problem import prob, obj
-
-
+from params import params
+from objective import objective
+import time
+#from gurobipy import *
 #QP solver
-def qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init):
+def qp_solve(prob, p_init, x_init, y_init, step, lb_init, ub_init, verbose_level, N):
     """
     QP solver for path-following algorithm
     inputs: prob - problem description
-            p - parameter
+            p - parameters
             x_init - initial primal variable
             y_init - initial dual variable
-            step - step to be taken
-            lb - lower bounds
-            ub - upper bounds
-            N - number of iterations
-            x0 -
-            lb_init - initial lower bounds
-            ub_init - initial upper bounds
+            step - step to be taken (in p)
+            lb_init - lower bounds
+            ub_init - upper bounds
+            verbose_level - amount of output text
+            N - iteration number
     outputs: y - solution primal variable
             qp_val - objective function value
             qp_exit - return status of QP solver
                 
     """
     #Importing problem to be solved
-    n, np, neq, niq, name = prob()
-    x, p, f, f_fun, con, conf, ubx, lbx, ubg, lbg = obj(x_init,y_init,p_init, neq, niq, n, np)
 
-    #Deteriming constraint types
-    eq_con_ind = array([])
-    iq_con_ind = array([])
-    eq_con = array([])
-    iq_con = array([])
-    for i in range(0,len(lbg[0])):
-        if lbg[0,i] == 0:
-            eq_con = vertcat(eq_con,con[i])
-            eq_con_ind = append(eq_con_ind,i)
-        elif lbg[0,i] < 0:
-            iq_con = vertcat(iq_con,con[i])
-            iq_con_ind = append(iq_con_ind,i)
-    #Evaluating constraints at current iteration point
-    val = conf(x_init,p_init)
+    neq = prob['neq']                           #Number of equality constraints
+    niq = prob['niq']                         #Number of inequality constraints
+    name = prob['name']                                        #Name of problem
+    _, g, H, Lxp, cst, _, _, Jeq, dpe, _ = objective(x_init,y_init,p_init,N,params) #objective function
 
-    #Determining which inequality constraints are active
-    k_plus_tilde = array([])                                 #active constraint
-    k_zero_tilde = array([])                               #inactive constraint
-    for i in range(0, len(iq_con_ind)):
-        if val[i] >= ubg[0,i]:
-            k_zero_tilde = append(k_zero_tilde,i)
-        elif val[i] < ubg[0,i]:
-            k_plus_tilde = append(k_plus_tilde,i)
-    nk_pt = len(k_plus_tilde)                     #number of active constraints
-    nk_zt = len(k_zero_tilde)                   #number of inactive constraints
+    #Setting up QP
+    f = mtimes(Lxp,step) + g
+    
+    #Constraints
+    ceq = cst
+    Aeq = Jeq
+    beq = mtimes(dpe,step) + ceq
 
-    #Calculating Lagrangian
-    lam = SX.sym('lam',neq)         #lagrangian multiplier equality constraints
-    mu = SX.sym('mu',niq)         #lagrangian multiplier inequality constraints
-    #lag_f = Function('lag_f',[x,p,lam,mu],[f+mtimes(lam.T,eq_con)+ mtimes(mu.T,iq_con)])
-    lag_f = f+mtimes(lam.T,eq_con)+ mtimes(mu.T,iq_con)    #Lagrangian equation
+    #Check Lagrange multipliers from bound constraints
+    lamC = fabs(y_init['lam_x'])
+    BAC = where(lamC >= 1e-3) #setting limits to determine if constraint is active
 
-    #Calculating derivatives
-    g = gradient(f, x)             #derivative of objective function (g matrix)
-    g_fun = Function('g_fun',[x,p], [gradient(f, x)])
-    H = 2*jacobian(jacobian(lag_f,x),x)#second derivative of the Lagrangian (H matrix)
-    H_fun = Function('H_fun',[x,p,lam,mu],[jacobian(jacobian(lag_f,x),x)])
+    #Finding active constraints
+    numBAC = len(BAC)
+    for i in range(0,numBAC):
+        #Placing strongly active constraint on boundary
+        indB = BAC[i]
+        #Keeping upper bound on boundary
+        ub_init[indB] = 0
+        lb_init[indB] = 0
 
-    if len(eq_con_ind)>0:
-        deq = jacobian(eq_con,x)            #derivative of equality constraints
-    else:
-        deq = array([])
-    if len(iq_con_ind)>0:
-        diq = jacobian(iq_con,x)          #derivative of inequality constraints
-    else:
-        diq = array([])
-
-    #Creating constraint matrices
-    nc = niq + neq                                 #total number of constraints
-    if (niq>0) and (neq>0):                #Equality and inequality constraints
-        if (nk_zt >0):                              #Inactive constraints exist
-            A = SX.zeros((nc,n))
-            A[0,:] = deq                                              #A matrix
-            lba = SX.zeros((nc,1))
-            lba[0,:] = -eq_con                                #lower bound of A
-            uba = SX.zeros((nc,1))
-            uba[0,:]= -eq_con                                 #upper bound of A
-            for j in range(0,nk_pt): #adding active constraints
-                A[neq+j+1,int(k_plus_tilde[j])] = diq[int(k_plus_tilde[j])]
-                lba[neq+j+1,int(k_plus_tilde[j])] = -iq_con[int(k_plus_tilde[j])]
-                #uba[neq+1,:] = zeros((nk_pt,1))
-            for i in range(0,nk_zt): #adding inactive constraints
-                A[neq+nk_pt+i+1,int(k_zero_tilde[i])] = diq[int(k_zero_tilde[i])]
-                lba[neq+nk_pt+i+1,int(k_zero_tilde[i])] = -iq_con[int(k_zero_tilde[i])]
-                uba[neq+nk_pt+i+1,int(k_zero_tilde[i])] = -iq_con[int(k_zero_tilde[i])]
-        else:                                          #Active constraints only
-            A = vertcat(deq,diq)
-            lba = vertcat(-eq_con,-iq_con)
-            uba = vertcat(-eq_con,-iq_con)
-    elif (niq>0) and (neq==0):                           #Inquality constraints
-        if (nk_zt >0):                              #Inactive constraints exist
-            A = SX.zeros((nc,n))
-            lba = SX.zeros((nc,1))
-            uba =  SX.zeros((nc,1))
-            for j in range(0,nk_pt): #adding active constraints
-                A[j,int(k_plus_tilde[j])] = diq[int(k_plus_tilde[j])]
-                lba[j] = -iq_con[int(k_plus_tilde[j])]
-                uba[j] = -iq_con[int(k_plus_tilde[j])]
-            for i in range(0,nk_zt): #adding inactive constraints
-                A[nk_pt+i,int(k_zero_tilde[i])] = diq[int(k_zero_tilde[i])]
-                lba[nk_pt+i] = -iq_con[int(k_zero_tilde[i])]
-                #uba[nk_pt+i] = -iq_con[int(k_zero_tilde[i])]
-        else:
-            A = vertcat(deq,diq)
-            lba = -iq_con
-            uba = -iq_con
-    elif (niq==0) and (neq>0):                            #Equality constriants
-        A = deq
-        lba = -eq_con
-        uba = -eq_con
-    A_fun = Function('A_fun',[x,p],[A])
-    lba_fun = Function('lba_fun',[x,p],[lba])
-    uba_fun = Function('uba_fun',[x,p],[uba])
-
-    #Checking that matrices are correct sizes and types
-    if (H.size1() != n) or (H.size2() != n) or (H.is_dense()=='False'):
-        #H matrix should be a sparse (nxn) and symmetrical
-        print('WARNING: H matrix is not the correct dimensions or matrix type')
-    if (g.size1() != n) or (g.size2() != 1) or g.is_dense()=='True':
-        #g matrix should be a dense (nx1)
-        print('WARNING: g matrix is not the correct dimensions or matrix type')
-    if (A.size1() !=(neq+niq)) or (A.size2() != n) or (A.is_dense()=='False'):
-        #A should be a sparse (nc x n)
-        print('WARNING: A matrix is not the correct dimensions or matrix type')
-    if lba.size1() !=(neq+niq) or (lba.size2() !=1) or lba.is_dense()=='False':
-        print('WARNING: lba matrix is not the correct dimensions or matrix type')
-    if uba.size1() !=(neq+niq) or (uba.size2() !=1) or uba.is_dense()=='False':
-        print('WARNING: uba matrix is not the correct dimensions or matrix type')
-
-    #Evaluating QP matrices at optimal points
-    H_opt = 2*H_fun(x_init,p_init,lam_opt,mu_opt)
-    g_opt = g_fun(x_init, p_init)
-    A_opt = A_fun(x_init,p_init)
-    lba_opt = lba_fun(x_init,p_init)
-    uba_opt = uba_fun(x_init,p_init)
-    #Defining QP structure
+    #Solving the QP
     qp = {}
-    qp['h'] = H_opt.sparsity()
-    qp['a'] = A_opt.sparsity()
+    qp['h'] = H.sparsity()
+    qp['a'] = Aeq.sparsity()
     optimize = conic('optimize','qpoases',qp)
-    optimal = optimize(h=H_opt, g=g_opt, a=A_opt, lba=lba_opt, uba=uba_opt, x0=x_init)
-
+    startqp = time.time()
+    optimal = optimize(h=H, g=f, a=Aeq, lba=beq, uba=beq, lbx=lb_init, ubx=ub_init, x0=x_init)
+    elapsedqp = time.time()-startqp
+    print elapsedqp
+    raw_input()
     x_qpopt = optimal['x']
-    lag_qpopt = optimal['lam_a']
-    #determing Lagrangian constants
-    lam_qpopt = zeros((nk_zt,1))
-    mu_qpopt = zeros((nk_pt,1))
-    for j in range(0,len(k_plus_tilde)):
-        lam_qpopt[j] = lag_qpopt[int(k_plus_tilde[j])]
-    for k in range(0,len(k_zero_tilde)):
-        mu_qpopt[k] = lag_qpopt[int(k_zero_tilde[j])]
-#    print('lam:',lam_qpopt)
-#    print('mu:',mu_qpopt)
-    return(optimal,x_qpopt,lam_qpopt,mu_qpopt)
-#qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt)
+    if x_qpopt.shape == x_init.shape:
+        qp_exit = 'optimal'
+    else:
+        qp_exit = ''

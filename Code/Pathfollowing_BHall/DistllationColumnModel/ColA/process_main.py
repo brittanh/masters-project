@@ -35,11 +35,10 @@ Uf = 0.3                                               #Feed rate to CSTR (F_0)
 params['dist']['F_0'] = Uf
 
 #Applying ideal NMPC
-_, xmeasureAll, uAll, obj, optRes, params, runtime = iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params)
-
-print "iNMPC finished \n"
+#_, xmeasureAll, uAll, obj, optRes, params, runtime = iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params)
+#
+#print "iNMPC finished \n"
 
 #Applying path-following NMPC
-#_, xmeasureAll_pf, uAll_pf, obj_pf, optRest_pf, params_pf, runtime_pf = pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, varargin)
-
+_, xmeasureAll_pf, uAll_pf, obj_pf, optRest_pf, params_pf, runtime_pf = pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params)
 

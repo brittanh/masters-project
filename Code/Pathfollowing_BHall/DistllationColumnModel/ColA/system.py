@@ -19,8 +19,11 @@ def system(t, x, u, T):
         global uc
         """
             Inputs- uc[0] - reflux LT
-            uc[1] - boilup VB
-            These inputs are set by altering col_LV.py file.
+                    uc[1] - boilup VB
+                    uc[2] - feed F
+                    uc[3] - distillate D
+                    uc[4] - bottoms B
+                    
             Outputs-x - liquid coposition and hold up for stages 1 to NT
         """
         NT = params['dist']['NT']          #Number of stages in distillation column

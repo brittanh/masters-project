@@ -18,7 +18,7 @@ from problem import prob, obj
 #mu_opt = array([0])
 
 #QP solver
-def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt,case):
+def qp_solve(prob, obj, p_init, x_init, y_init, lam_opt, mu_opt, case):
     """
     QP solver for path-following algorithm
     inputs: prob - problem description

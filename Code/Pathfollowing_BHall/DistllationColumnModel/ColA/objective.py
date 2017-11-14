@@ -7,103 +7,126 @@
     @version: 0.1
     @updates:
 """
-from casadi import *
-from numpy import size, append, transpose
+from casadi import MX, SX, vertcat, Function, mtimes, DM
+from numpy import size, append, transpose, multiply
 import scipy.io as spio
-from distcolcstr_prob import itPredHor
-from params import *
+from itPredHorizon_pf import itPredHorizon_pf
+from ColCSTR_model import ColCSTR_model
+from collocationSetup import collocationSetup
 
-def objective(x,y,p,N):
+def objective(x,y,p,N,params):
     
-    nPrimal = size(x)
-    nDual = size(y['lam_g'])
-    nParam = size(p)
+    nPrimal = x.numel()                                       #number of primal
+    nDual = y['lam_g'].numel()                                  #number of dual
+    nParam = p.numel()                                     #number of parameters
+    
+    #Loading initial states and controls
+    data = spio.loadmat('CstrDistXinit.mat', squeeze_me = True)
+    Xinit = data['Xinit']
+    xf = Xinit[0:84]
+    u_opt = Xinit[84:]
 
     #Model parameters
     NT = params['dist']['NT']          #Number of stages in distillation column
     Uf = 0.3                                             #Feed rate to CSTR F_0
-    ~,state,xdot,inputs = ColCSTR_model(Uf)
+    _,state,xdot,inputs = ColCSTR_model(Uf,params)
     sf = Function('sf',[state,inputs],[xdot])
 
-    global nx nu nk d tf ns
-    h = tf/nk
+    params['model']['sf'] = sf
+    params['model']['xdot_val_rf_ss'] = xf
+    params['model']['x'] = x
+    params['model']['u_opt'] = u_opt
+    
+    nx = params['prob']['nx']
+    nu = params['prob']['nu']
+    nk = params['prob']['nk']
+    tf = params['prob']['tf']
+    ns = params['prob']['ns']
+    h = params['prob']['h']
 
-    #preparing collocation matrices
-    ~,C,D,d = collocationSetup()
-
+    #Preparing collocation matrices
+    _,C,D,d = collocationSetup()
+    params['prob']['d'] = d
+    colloc = {'C':C,'D':D, 'h':h}
+    params['colloc'] = colloc
+    
     #NLP variable vector
-    V = {}                                #Decision variables (control + state)
+    V = MX()                                #Decision variables (control + state)
     obj = 0                                                 #Objective function
-    cons = {}
+    cons = MX()                                          #Nonlinear Constraints
     delta_time = 1
     alpha = 1
     beta = 1
     gamma = 1
 
-    #Loading initial states and controls
-    data = spio.loadmat('CstrDistXinit.mat', squeeze_me = True)
-    Xinit = data['Xinit']
-    xf = Xinit[0:84]
-    u_opt = Xinit[85:89]
+    params['weight']['delta_time'] = delta_time
+    params['weight']['alpha'] = alpha
+    params['weight']['beta'] = beta
+    params['weight']['gamma'] = gamma
 
     #Initial conditions
     X0 = MX.sym('X0', nx)
-    V = append(V,X0)
-    cons = append(cons, X0 - x[0:nx,0])
+    V = vertcat(V,X0)                                       #Decision variables
+    cons = vertcat(cons, X0 - x[0:nx,0])                 #Nonlinear constraints
     cons_x0 = X0 - x[0:nx,0]
 
-   #Formulating the NLP
-   Xk = X0
-   data = spio.loadmat('Qmax.mat', squeeze_me = True)
-   param['Qmax'] = data['Qmax']
-   ssoftc = 0
-   for i in range(0,N):
-       obj, cons, V, Xk, params, ssoftc = itPredHorizon(Xk, V, cons, obj, params, i, ssoftc)
-                               
-   V = vertcat(V[:])
-   con = vertcat(cons[:])
+    #Formulating the NLP
+    Xk = X0
+    data = spio.loadmat('Qmax.mat', squeeze_me = True)
+    params['Qmax'] = data['Qmax']
+    ssoftc = 0
+    
+    for i in range(0,N):
+       obj, cons, V, Xk, params, ssoftc = itPredHorizon_pf(Xk, V, cons, obj, params, i, ssoftc)
 
-   #Objective function and constraint functions
-   f = Function('f', [V], [obj], chr('V'), chr('objective'))
-   c = Function('c', [V], [cons], chr('V'), chr('constraint'))
-   cx0 = Function('cx0',[X0], [cons_x0], chr('X0'), chr('constraint'))
+    V = vertcat(V[:])
+    cons = vertcat(cons[:])
+
+    #Objective function and constraint functions
+    f = Function('f', [V], [obj], ['V'], ['objective']) #Objective function
+    c = Function('c', [V], [cons], ['V'], ['constraint']) #Nonlinear constraints
+    cx0 = Function('cx0',[X0], [cons_x0], ['X0'], ['constraint']) #Decision variable constraints
                                
-   #Constructing Lagrangian
-   lag_expr = obj + transpose(y['lam_g'])*cons
-   g = gradient(f)
-   lagr = Function('lagr', [V], [lag_expr], chr('V'), chr('lag_expr'))
-   H = Function('H',hessian(lagr,['V','lag_expr']))
-   Hobj = hessian(f,['V','objective'])
-   J = jacobian(c,['V','constraint'])
-   Jp = jacovian(cx0,['X0','constraint'])
-                               
-   f = f(x)
-   g = g(x)
-   H = H(x)
-   Lxp = H[0:nPrimal,0:nParam]
-   J = J(x)
-   Jtemp = zeros((nDual,nParam))
-   cp = Jp(x[0:nParam])
-   Jtemp[0:nParam, 0:nParam] = full(cp)
-   cp = spares(Jtemp)
-   cst = c(x)
+    #Constructing Lagrangian
+    lag_expr = obj + mtimes(transpose(y['lam_g']),cons)             #Lagrangian
+    g = f.gradient()                            #Gradient of objective function
+    lagr = Function('lagr', [V], [lag_expr], ['V'], ['lag_expr']) #Lagrangian fxn
+    H = Function(lagr.hessian('V','lag_expr'))           #Hessian of Lagrangian
+    Hobj = f.hessian('V','objective')            #Hessian of objective function
+    J = c.jacobian('V','constraint')         #Jacobian of nonlinear constraints
+    Jp = cx0.jacobian('X0','constraint') #Jacobian of decision variable constraints
+
+    #Evaluating functions at current point
+    f = f(x)
+    g = g(x)
+    g = g[0]
+    H = H(x)
+    H = H[0]
+    Lxp = H[0:nPrimal,0:nParam]
+    J = J(x)
+    J = J[0]
+    Jtemp = DM.zeros((nDual,nParam))
+    cp = Jp(x[0:nParam])
+    cp = cp[0]
+    Jtemp[0:nParam, 0:nParam] = cp.full()
+    cp = Jtemp.sparse()
+    cst = c(x)
+
+    #Evaluation of objective function used for Greshgorin bound
+    Hobj = Hobj(x)
+    Hobj = Hobj[0].sparse()
+    f = f.full()
+    g = g.sparse()
+    #H = H.sparse()
+    Lxp = Lxp.sparse()
+    #J = J.sparse()
+    cst = cst.full()
    
-   #Evaluation of objective function used for Greshgorin bound
-   Hobj = Hobj(x)
-   Hobj = sparse(Hobj)
-   f = full(f)
-   g = sparse(g)
-   H = sparse(H)
-   Lxp = sparse(Lxp)
-   J = sparse(J)
-   cp = sparse(cp)
-   cst = full(cst)
-   
-   #Equality constraint
-   Jeq = J
-   dpe = cp
-   
-   return f, g, H, Lxp, cst, J, cp, Jeq, dpe, Hobj
+    #Equality constraint
+    Jeq = J
+    dpe = cp
+
+    return f, g, H, Lxp, cst, J, cp, Jeq, dpe, Hobj
                                
                                
                    

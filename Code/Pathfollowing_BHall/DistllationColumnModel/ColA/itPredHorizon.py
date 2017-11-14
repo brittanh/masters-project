@@ -6,7 +6,7 @@
     @date: 07.10.2017
     @version: 0.1
     @updates:
-    """
+"""
 from casadi import *
 from numpy import ones, zeros, multiply, append
 import scipy.io as spio

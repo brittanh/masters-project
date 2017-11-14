@@ -7,7 +7,7 @@
     @version: 0.1
     @updates:
 """
-from numpy import size, zeros, append, hstack, vstack, reshape, savetxt
+from numpy import size, zeros, append, hstack, savetxt
 import scipy.io as spio
 from compObjFn import *
 from solveOpt import *
@@ -106,14 +106,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
 
         iter += 1
     
-    xmeasureAll = reshape(xmeasureAll,(2*NT+2, MPCit))
-    for i in range(0,xmeasureAll.shape[1]):
-        xAll.concatenate(xAll,xmeasureAll[:,i])
-        print xAll
-        raw_input()
-    print xmeasureAll[0:,0:]
-    print type(xmeasureAll)
-    raw_input()
+    xmeasureAll.reshape((2*NT+2, MPCit))
     
     ideal = {
             'ideal':{
@@ -123,8 +116,6 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
                 'ObjEcon': array(ObjVal.values()[0])
                 }
     }
-    print ideal
-    raw_input()
+
     savemat('iNMPC.mat',ideal)  #saving iNMPC results to compare with pfNMPC
-    raw_input()
     return Tall, xmeasureAll, uAll, ObjVal, primalNLP, params, runtime

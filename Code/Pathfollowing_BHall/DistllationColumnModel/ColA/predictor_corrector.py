@@ -12,6 +12,7 @@ from qp_solve import *
 from numpy import zeros
 
 def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_init, ub_init, verbose_level, N):
+    
     p = p_init
     pp = SX.sym('pp')
     prob = problem(pp)
@@ -30,8 +31,14 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
     while t<=1:
         #Calculating the step
         tk = t + delta_t
+        print p_0
+        print p_0.shape
+        raw_input()
         p_t = (1-tk)*p_0 +tk*p_final
         step = p_t + p_init
+        print step.shape
+        raw_input()
+        
         #Updating bound constraints
         if lb_init:
             lb = lb_init-x_init
@@ -39,8 +46,34 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
         elif not lp_init:
             lb = array([])
             ub = array([])
+        
         #Solve QP problem
-        y, ~, qp_exit, lam, qp_run = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init)
+        qp_exit, y, qp_val, lam_qpopt, mu_qpopt, qprun = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init)
+        elapsedqp += qprun
 
+        if qp_exit != 'optimal':
+            #QP infeasible
+            delta_t = alpha_2*t                                   #shorten step
+            
+            #Print out iteration number and failure
+            iter = iter + 1
+            success = 0
+            if verbose_level:
+                print '%f    %f  %f   %d' %(iter, delta_t, t, success)
+        else:
+            #QP is feasible
+            #Update states, multipliers, parameter and time step
+            x_init = x_init + y
+            y_init['lam_x'] = y_init['lam_x'] + lam_qpopt['lam_x']
+            t = t + delta_t
+            p_init = p_t
+            #Print out iteration number and success
+            iter = iter + 1
+            success = 1
+            if verbose_level:
+                print '%f    %f  %f   %d' %(iter, delta_t, t, success)
 
-
+        if (1-t) <= 1e-5
+            break
+                
+    return x_init, y_init, elapsedqp

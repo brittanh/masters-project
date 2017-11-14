@@ -8,11 +8,11 @@
     @updates:
 """
 from casadi import Function, MX, SX, vertcat
-from collocationSetup import *
-from ColCSTR_model import *
+from collocationSetup import collocationSetup
+from ColCSTR_model import ColCSTR_model
 from numpy import zeros, ones, array, transpose, matlib, tile, reshape, shape, savetxt
 import scipy.io as spio
-from itPredHorizon import *
+from itPredHorizon import itPredHorizon
 
 def optProblem(x, u, x0_measure, N, params):
     
@@ -47,7 +47,7 @@ def optProblem(x, u, x0_measure, N, params):
     params['model'] = model
 
     #Preparing collocation matrices
-    _, C, D, d = collocationSetup() #function from casadi
+    _, C, D, d = collocationSetup() 
     params['prob']['d'] = d                             #Adding d to parameters
 
     #Collecting collocation variables

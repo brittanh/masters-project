@@ -7,9 +7,9 @@
     @version: 0.1
     @updates:
 """
-File1 = 'dMxdt_matlab.txt'
-File2 = 'dMxdt_py.txt'
-filename = 'file_dMxdt.txt'
+File1 = 'lag_expr.txt'
+File2 = 'lag_expr_py.txt'
+filename = 'file_lagr.txt'
 
 def compare(File1,File2, filename):
     f1 = open(File1, "r")
