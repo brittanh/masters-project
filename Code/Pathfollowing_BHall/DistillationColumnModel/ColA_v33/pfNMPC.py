@@ -57,9 +57,9 @@ def pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         x0_measure = x0 + measure_noise  #Add measmt noise to states
 
         #advanced-step NMPC
-        primalNLP,dualNLP,lb,ub,objVal,params,_=solveOpt(optProblem,
-                                                x0,u0,N,z1,params)
-        
+        primalNLP, dualNLP, lb , ub, objVal, params, elapsedqp, w = solveOpt(optProblem, x0, u0, N, z1, params)
+
+                                
         #re-arrange NLP solutions
         _, x_nlp_opt = plotStates(primalNLP, lb, ub, N, params)
 
@@ -73,8 +73,8 @@ def pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         ub_init = ub
 
         #NLP sensitivity (predictor-corrector)
-        primalPF, _,elapsedqp=predictor_corrector(lambda p:ColCSTR_pf(p),
-            p_init,p_final,xstart,ystart,delta_t,lb_init,ub_init,0,N)
+        primalPF, _,elapsedqp = predictor_corrector(lambda p:ColCSTR_pf(p),
+            p_init,p_final,xstart,ystart,delta_t,lb_init,ub_init,0,N,w)
 
         runtime_pf = append(runtime_pf, elapsedqp)
             

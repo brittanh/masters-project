@@ -15,10 +15,11 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
     
     p = p_init
     pp = SX.sym('pp')
-    prob = problem(pp)
+    theprob = lambda p: problem(pp)
+    prob = theprob(p)
     t = 0
-    alpha_2 = 0.5
-    iter = 0 #number of iterations
+    alpha_1 = 0.5
+    iter = 1 #iteration number
     elapsedqp = 0
     numX = shape(x_init)[0]
     x0 = zeros(numX)
@@ -31,8 +32,8 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
     while t<=1:
         #Calculating the step
         tk = t + delta_t
-        p_t = (1-tk)*p_0 +tk*p_final
-        step = p_t + p_init
+        p_t = (1-tk)*p_0 + tk*p_final
+        step = p_t - p_init
         
         #Updating bound constraints
         if lb_init.any():
@@ -43,30 +44,42 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
             ub = array([])
 
         #Solve QP problem
-        qp_exit, y, qp_val, lam_qpopt, mu_qpopt, qprun = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init)
-        elapsedqp += qprun
-
-        if qp_exit != 'optimal':#QP infeasible
-            delta_t = alpha_2*t                                   #shorten step
+        y, qp_val, qp_exit, lam_qpopt, mu_qpopt, qptime = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init)
+        elapsedqp += qptime
+        
+        if qp_exit == 'infeasible':#QP infeasible
+            print "---------------------------------------------------------\n"
+            print "The QP is infeasible"
+            delta_t = alpha_1*t                        #shorten step
+            t = t - delta_t
             
             #Print out iteration number and failure
-            iter = iter + 1
+            
             success = 0
             if verbose_level:
                 print '%f    %f  %f   %d' %(iter, delta_t, t, success)
-        else:#QP feasible
+            iter += 1
+        elif qp_exit == 'feasible':#QP feasible
             #Update states, multipliers, parameter and time step
             x_init = x_init + y
-            y_init['lam_x'] = y_init['lam_x'] + lam_qpopt['lam_x']
+            y_init['lam_x'] = y_init['lam_x'] + mu_qpopt
             t = t + delta_t
             p_init = p_t
+            
             #Print out iteration number and success
-            iter = iter + 1
+            print "---------------------------------------------------------\n"
+            print "The QP is feasible"
+            print "iteration number: %d\n" %iter
             success = 1
             if verbose_level:
                 print '%f    %f  %f   %d' %(iter, delta_t, t, success)
+            
+            #Fix Steplength
+            print "delta_t: %f\n" %delta_t
+            print "t: %f\n" %t
+            iter += 1
 
         if (1-t) <= 1e-5:
             break
-                
+        
     return x_init, y_init, elapsedqp

@@ -14,7 +14,7 @@ from objective import objective
 import time
 from nlp_solve import *
 
-def qp_solve(prob, p_init, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init):
+def qp_solve(prob, p_init, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init, w):
     """
     QP solver for path-following algorithm
     inputs: prob - problem description
@@ -60,29 +60,25 @@ def qp_solve(prob, p_init, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init
         ub[indB] = 0
         lb[indB] = 0
 
-    #Solving the QP
+    #=======================Solving using GUROBI============================##
     qp = {}
     qp['h'] = H.sparsity()
     qp['a'] = Aeq.sparsity()
-    f = Function()
-    #optimize = conic('optimize','gurobi',qp, qp_options)
-    options = {}
+    optimize = conic('optimize','gurobi',qp)
     startqp = time.time()
-    #optimal = optimize(h=H, g=f, a=Aeq, lba=beq, uba=beq, lbx=lb, ubx=ub, x0=x0)
-    NLP = {'x': x, 'f': , 'g': f}
-    optimal = nlp_solve
+    optimal = optimize(h=H, g=f, a=Aeq, lba=beq, uba=beq, lbx=lb, ubx=ub)
     elapsedqp = time.time()-startqp
-    raw_input()
-    x_qpopt = optimal['x'] #primal solution
-    y = x_qpopt
-    qp_val = optimal['cost'] #optimal cost
-    lam_qpopt = optimal['lam_a'] #dual solution corresponding to linear bounds
-    mu_qpopt = optimal['lam_x'] #dual solution corresponding to simple bounds
+    y = optimal['x']
+    qp_val = optimal['cost']
+    lam_qpopt = optimal['lam']
+    mu_qpopt = optimal['mu']
     
-    
-    if isnan(array(x_qpopt[0])):
+    if isnan(array(x_qpopt[0])) or array(x_qpopt[0])==0:
         qp_exit = 'infeasible'
     else:
         qp_exit = 'optimal'
+    print y
+    print qp_val
+    raw_input()
 
     return y, qp_val, qp_exit, lam_qpopt, mu_qpopt, elapsedqp

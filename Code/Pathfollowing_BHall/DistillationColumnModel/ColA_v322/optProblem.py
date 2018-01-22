@@ -34,42 +34,44 @@ def optProblem(x, u, x0_measure, N, params):
     u_opt = Xinit[84:89]
 
     #Problem dimensions
-    nx = params['prob']['nx']    #Number of states (CSTR + Distillation Column)
-    nu = params['prob']['nu']               #Number of inputs (LT, VB, F, D, B)
+    nx = params['prob']['nx']          #Number of states
+    nu = params['prob']['nu']          #Number of inputs
     nk = params['prob']['nk']
-    tf = params['prob']['tf']                                            #[min]
+    tf = params['prob']['tf']
     h =  params['prob']['h']
     ns = params['prob']['ns']
 
     #Collecting model variables
-    u = tile(u,nk)                                              #Duplicating u0
-    model = {'NT': NT, 'f': f, 'xdot_val_rf_ss': xf, 'x': x, 'u_opt': u_opt, 'u':u}
+    u = tile(u,nk)
+    model = {'NT': NT, 'f': f, 'xdot_val_rf_ss': xf,
+            'x': x, 'u_opt': u_opt, 'u':u}
     params['model'] = model
 
     #Preparing collocation matrices
     _, C, D, d = collocationSetup() 
-    params['prob']['d'] = d                             #Adding d to parameters
+    params['prob']['d'] = d
 
     #Collecting collocation variables
     colloc = {'C': C, 'D': D, 'h': h}
     params['colloc'] = colloc
     
     #Empty NLP
-    w = MX()                              #Decision variables (control + state)
-    w0 = []                                                      #Initial guess
-    lbw = []                                 #Lower bound for decision variable
-    ubw = []                                 #Upper bound for decision variable
-    g = MX()                                              #Nonlinear constraint
-    lbg = []                              #Lower bound for nonlinear constraint
-    ubg = []                              #Upper bound for nonlinear constraint
-    J = 0                                        #Initialize objective function
+    w = MX()               #Decision variables (control + state)
+    w0 = []                                       #Initial guess
+    lbw = []                  #Lower bound for decision variable
+    ubw = []                  #Upper bound for decision variable
+    g = MX()                               #Nonlinear constraint
+    lbg = []               #Lower bound for nonlinear constraint
+    ubg = []               #Upper bound for nonlinear constraint
+    J = 0                         #Initialize objective function
     
     #Weight variables
     delta_t = 1
     alpha = 1
     beta = 1
     gamma = 1
-    weight = {'delta_t': delta_t, 'alpha': alpha, 'beta': beta, 'gamma': gamma}
+    weight = {'delta_t': delta_t, 'alpha': alpha,
+        'beta': beta, 'gamma': gamma}
     params['weight'] = weight
    
     #Initial conditions
@@ -87,7 +89,7 @@ def optProblem(x, u, x0_measure, N, params):
     Qmax = data['Qmax']
     params['Qmax'] = Qmax
   
-    count = 2                                       #Counter for state variable
+    count = 2                         #Counter for state variable
     ssoftc = 0
     for iter in range(0,N):
         J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc = itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d)

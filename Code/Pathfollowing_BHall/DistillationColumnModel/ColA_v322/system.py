@@ -26,14 +26,14 @@ def system(t, x, u, T):
                     
             Outputs-x - liquid coposition and hold up for stages 1 to NT
         """
-        NT = params['dist']['NT']          #Number of stages in distillation column
+        NT = params['dist']['NT']          #Number of stages in column
         LT = uc[0]
         VB = uc[1]
         F = uc[2]
         D = uc[3]
         B = uc[4]
-        F_0 = params['dist']['F_0']                                  #CSTR feedrate
-        zF = params['dist']['zF'][0]                          #Feed composition [A]
+        F_0 = params['dist']['F_0']                       #CSTR feedrate
+        zF = params['dist']['zF'][0]               #Feed composition [A]
         
         #Collecting inputs and disturbances
         u_all = append(LT,VB)

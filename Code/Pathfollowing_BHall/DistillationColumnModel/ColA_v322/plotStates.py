@@ -28,7 +28,6 @@ def plotStates(data, lb, ub, N, params):
     
     lb0 = lb[0:nx+ns]
     lb = delete(lb,range(0,nx))
-    #print where(lb!=0)[0]
     lb = reshape(lb,(nu+(nx+ns)*d+(nx+ns),N*nk))
     lbU = lb[0:nu, 0:N*nk]
     lb = lb[nu:,:]
@@ -49,7 +48,7 @@ def plotStates(data, lb, ub, N, params):
     plotUb = zeros((nx+ns,nPoint))
     plotUb[:,0] = ub0
 
-    #Extract states from each collocation point at each time horizon
+    #Extract states from each colloc point at each time horizon
     sInd = 1 #initial index row
     for i in range(0,N*nk-1):
         temp = data[:,i]

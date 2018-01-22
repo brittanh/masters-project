@@ -7,8 +7,8 @@
     @version: 0.1
     @updates:
 """
-from casadi import MX, SX, vertcat, Function, mtimes, DM
-from numpy import size, append, transpose, multiply
+from casadi import MX, SX, vertcat, Function, mtimes, DM, jacobian, hessian, transpose
+from numpy import size, append,multiply, shape
 import scipy.io as spio
 from itPredHorizon_pf import itPredHorizon_pf
 from ColCSTR_model import ColCSTR_model
@@ -16,9 +16,9 @@ from collocationSetup import collocationSetup
 
 def objective(x,y,p,N,params):
     
-    nPrimal = x.numel()                                       #number of primal
-    nDual = y['lam_g'].numel()                                  #number of dual
-    nParam = p.numel()                                     #number of parameters
+    nPrimal = x.numel()               #number of primal sln
+    nDual = y['lam_g'].numel()               #number of dual
+    nParam = p.numel()                  #number of parameters
     
     #Loading initial states and controls
     data = spio.loadmat('CstrDistXinit.mat', squeeze_me = True)
@@ -27,8 +27,8 @@ def objective(x,y,p,N,params):
     u_opt = Xinit[84:]
 
     #Model parameters
-    NT = params['dist']['NT']          #Number of stages in distillation column
-    Uf = 0.3                                             #Feed rate to CSTR F_0
+    NT = params['dist']['NT']             #Stages in column
+    Uf = 0.3                          #Feed rate to CSTR F_0
     _,state,xdot,inputs = ColCSTR_model(Uf,params)
     sf = Function('sf',[state,inputs],[xdot])
 
@@ -45,15 +45,16 @@ def objective(x,y,p,N,params):
     h = params['prob']['h']
 
     #Preparing collocation matrices
-    _,C,D,d = collocationSetup()
+    _, C, D, d = collocationSetup()
     params['prob']['d'] = d
     colloc = {'C':C,'D':D, 'h':h}
     params['colloc'] = colloc
     
     #NLP variable vector
-    V = MX()                                #Decision variables (control + state)
+    V = MX()                              #Decision variables (control + state)
     obj = 0                                                 #Objective function
     cons = MX()                                          #Nonlinear Constraints
+    
     delta_time = 1
     alpha = 1
     beta = 1
@@ -63,15 +64,21 @@ def objective(x,y,p,N,params):
     params['weight']['alpha'] = alpha
     params['weight']['beta'] = beta
     params['weight']['gamma'] = gamma
-
-    #Initial conditions
+    
+    #Initial states and Controls
+    data_init = spio.loadmat('CstrDistXinit.mat', squeeze_me = True)
+    xf = data_init['Xinit'][0:84]
+    u_opt = data_init['Xinit'][84:89]
+    
+    #"Lift" Initial conditions
     X0 = MX.sym('X0', nx)
-    V = vertcat(V,X0)                                       #Decision variables
-    cons = vertcat(cons, X0 - x[0:nx,0])                 #Nonlinear constraints
+    V = vertcat(V,X0)                     #Decision variables
+    cons = vertcat(cons, X0 - x[0:nx,0]) #Nonlinear constraints
     cons_x0 = X0 - x[0:nx,0]
 
     #Formulating the NLP
     Xk = X0
+    
     data = spio.loadmat('Qmax.mat', squeeze_me = True)
     params['Qmax'] = data['Qmax']
     ssoftc = 0
@@ -83,23 +90,26 @@ def objective(x,y,p,N,params):
     cons = vertcat(cons[:])
 
     #Objective function and constraint functions
-    f = Function('f', [V], [obj], ['V'], ['objective']) #Objective function
-    c = Function('c', [V], [cons], ['V'], ['constraint']) #Nonlinear constraints
-    cx0 = Function('cx0',[X0], [cons_x0], ['X0'], ['constraint']) #Decision variable constraints
-                               
+    f = Function('f', [V], [obj], ['V'], ['objective'])
+    c = Function('c', [V], [cons], ['V'], ['constraint'])
+    cx0 = Function('cx0',[X0], [cons_x0], ['X0'], ['constraint'])
+
     #Constructing Lagrangian
-    lag_expr = obj + mtimes(transpose(y['lam_g']),cons)             #Lagrangian
-    g = f.gradient()                            #Gradient of objective function
-    lagr = Function('lagr', [V], [lag_expr], ['V'], ['lag_expr']) #Lagrangian fxn
-    H = Function(lagr.hessian('V','lag_expr'))           #Hessian of Lagrangian
-    Hobj = f.hessian('V','objective')            #Hessian of objective function
-    J = c.jacobian('V','constraint')         #Jacobian of nonlinear constraints
-    Jp = cx0.jacobian('X0','constraint') #Jacobian of decision variable constraints
+    lag_expr = obj + mtimes(transpose(y['lam_g']),cons)
+    g = Function('g',[V],[jacobian(obj,V),obj])
+    lagr = Function('lagr', [V], [lag_expr], ['V'], ['lag_expr'])
+    [H,gg] = hessian(lag_expr,V)
+    H = Function('H',[V],[H,gg])
+    [Hobj,gobj] = hessian(obj,V)
+    Hobj = Function('Hobj', [V], [Hobj,gobj])
+    J = Function('J',[V],[jacobian(cons,V),cons])
+    Jp = Function('Jp',[X0],[jacobian(cons_x0,X0),cons_x0])
 
     #Evaluating functions at current point
     f = f(x)
     g = g(x)
     g = g[0]
+    g = transpose(g)
     H = H(x)
     H = H[0]
     Lxp = H[0:nPrimal,0:nParam]
@@ -117,9 +127,7 @@ def objective(x,y,p,N,params):
     Hobj = Hobj[0].sparse()
     f = f.full()
     g = g.sparse()
-    #H = H.sparse()
     Lxp = Lxp.sparse()
-    #J = J.sparse()
     cst = cst.full()
    
     #Equality constraint

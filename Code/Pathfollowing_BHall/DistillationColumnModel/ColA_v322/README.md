@@ -12,7 +12,7 @@ To use the code the following elements are required to be installed:
 
 * Python 2.7
 * [Numpy](http://www.numpy.org/)
-* [Casadi](https://github.com/casadi/casadi/wiki) (version v3.2.0)
+* [Casadi](https://github.com/casadi/casadi/wiki) (version v3.3.0): includes wrapper to gurobi
 
 ## Purpose
 This code implements economic NMPC using a path-following algorithm.

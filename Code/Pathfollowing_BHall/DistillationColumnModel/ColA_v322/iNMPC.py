@@ -40,7 +40,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     noise = data['noise']
 
     while (iter <= MPCit):
-        print "--------------------------------------------------\n"
+        print "---------------------------------------------\n"
         print "MPC iteration: %d \n" %(iter)
 
         #Obtaining new initial value
@@ -51,13 +51,14 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         t0,x0 = measureInitVal(tmeasure, xmeasure)
 
         #Measurement noise
-        n_M = noise[:,iter-1]                           #Holdup noise
-        n_X = zeros((NT+1,1))                    #Concentration noise
+        n_M = noise[:,iter-1]                 #Holdup noise
+        n_X = zeros((NT+1,1))           #Concentration noise
         measure_noise = append(n_X, n_M)
-        x0_measure = x0 + measure_noise   #Add measmt noise to states
+        x0_measure = x0 + measure_noise#Add measmt noise to states
 
         #Solving NLP
-        primalNLP, _, lb, ub, _, params, elapsedtime =solveOpt(optProblem, x0, u0, N, x0_measure,params)
+        primalNLP,_,lb,ub,_,params,_=solveOpt(optProblem,x0,
+                                            u0,N,x0_measure,params)
 
         #Re-arrange NLP solutions
         #(turning vectors into matrices to make easier to plot)
@@ -83,9 +84,9 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
             tapplied = t0 + T
             return tapplied, xapplied
         
-        #Apply control to process with optimized control from
-        #path-following algorithm
-        x0 = xmeasure                               #From online step
+        #Apply control to process with optimized
+        #control from path-following algorithm
+        x0 = xmeasure                        #From online step
         tmeasure,xmeasure=applyControl(system,T,t0,x0,u_nlp_opt)
 
         #Using actual state
@@ -125,6 +126,6 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
                 }
     }
 
-    savemat('iNMPC.mat',ideal)               #saving iNMPC results
+    savemat('iNMPC.mat',ideal)            #saving iNMPC results
 
-    return Tall,xmeasureAll,uAll,ObjVal,primalNLP,params,runtime
+    return Tall, xmeasureAll, uAll, ObjVal,primalNLP,params,runtime
