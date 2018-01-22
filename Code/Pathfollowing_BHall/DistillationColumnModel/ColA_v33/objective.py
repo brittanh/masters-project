@@ -87,19 +87,19 @@ def objective(x,y,p,N,params):
     cx0 = Function('cx0',[X0], [cons_x0], ['X0'], ['constraint']) #Decision variable constraints
                                
     #Constructing Lagrangian
-    lag_expr = obj + mtimes(transpose(y['lam_g']),cons)             #Lagrangian
-    #g = f.gradient()                            #Gradient of objective function
+    lag_expr = obj + mtimes(transpose(y['lam_g']),cons)         
+    #Gradient of objective function
     g = Function('g',[V],[jacobian(obj,V),obj])
-    lagr = Function('lagr', [V], [lag_expr], ['V'], ['lag_expr']) #Lagrangian fxn
-    #H = Function(lagr.hessian('V','lag_expr'))           #Hessian of Lagrangian
+    lagr = Function('lagr', [V], [lag_expr], ['V'], ['lag_expr'])
+    #Hessian of Lagrangian
     [H,gg] = hessian(lag_expr,V)
     H = Function('H',[V],[H,gg])
-    #Hobj = f.hessian('V','objective')            #Hessian of objective function
+    #Hessian of objective function
     [Hobj,gobj] = hessian(obj,V)
     Hobj = Function('Hobj', [V], [Hobj,gobj])
-    #J = c.jacobian('V','constraint')         #Jacobian of nonlinear constraints
+    #Jacobian of nonlinear constraints
     J = Function('J',[V],[jacobian(cons,V),cons])
-    #Jp = cx0.jacobian('X0','constraint') #Jacobian of decision variable constraints
+    #Jacobian of decision variable constraints
     Jp = Function('Jp',[X0],[jacobian(cons_x0,X0),cons_x0])
     #Evaluating functions at current point
     f = f(x)
@@ -122,10 +122,7 @@ def objective(x,y,p,N,params):
     Hobj = Hobj(x)
     Hobj = Hobj[0].sparse()
     f = f.full()
-    #g = g.sparse()
-    #H = H.sparse()
     Lxp = Lxp.sparse()
-    #J = J.sparse()
     cst = cst.full()
    
     #Equality constraint

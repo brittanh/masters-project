@@ -36,18 +36,20 @@ def compObjFn(uOpt,xActual):
     data = spio.loadmat('Q.mat', squeeze_me = True)
     Qmax = data['Q']
     c1 = -0.05 #noise
-    lss = -0.256905910000000 + c1 #steady state objective function value
+    lss = -0.256905910000000 + c1 #ss obj fxn value
     
     #Defining objective function
     Jecon = pf*F_0 + pV*uOpt[1] - pB*uOpt[4] - pD*uOpt[3]
-    Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], uOpt - us)), (uOpt - us))
-    Jstate = mtimes(transpose(multiply(Qmax[0:nx],(xActual -xs))),
-                    (xActual - xs))
+    Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu],
+                                uOpt - us)), (uOpt - us))
+    Jstate = mtimes(transpose(multiply(Qmax[0:nx],
+                        (xActual -xs))),(xActual - xs))
 
     J = Jecon + Jcontrol + Jstate -lss
     
-    print('----------------------------------------------------------------\n')
-    print("Jecon: %f,\n Jcontrol: %f, \n Jstate: %f, \n" %(Jecon, Jcontrol, Jstate))
+    print('-----------------------------------------\n')
+    print("Jecon: %f,\n Jcontrol: %f, \n Jstate: %f, \n"
+                %(Jecon, Jcontrol, Jstate))
     Jobj = {}
     Jobj['reg'] = J
     Jobj['econ'] = Jecon

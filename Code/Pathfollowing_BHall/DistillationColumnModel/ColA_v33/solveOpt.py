@@ -42,4 +42,4 @@ def solveOpt(optProblem, x0, u0, N, z1, params):
     lam['lam_x'] = sol['lam_x']
     objVal = sol['f']
 
-    return u, lam, lbw, ubw, objVal, params, elapsednlp
+    return u, lam, lbw, ubw, objVal, params, elapsednlp, w

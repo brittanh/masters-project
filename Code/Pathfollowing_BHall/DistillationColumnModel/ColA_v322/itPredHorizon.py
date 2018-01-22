@@ -14,10 +14,10 @@ import scipy.io as spio
 def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssoftc, d):
     
     #extracting parameter variables
-    nx = params['prob']['nx']    #Number of states (CSTR + Distillation Column)
-    nu = params['prob']['nu']               #Number of inputs (LT, VB, F, D, B)
+    nx = params['prob']['nx']           #Number of states
+    nu = params['prob']['nu']           #Number of inputs
     nk = params['prob']['nk']
-    tf = params['prob']['tf']                                            #[min]
+    tf = params['prob']['tf']
     h =  params['prob']['h']
     ns = params['prob']['ns']
     
@@ -64,13 +64,15 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         
         indexU = iter*nk + k
         w0 = append(w0,u[:,indexU])
-        Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], Uk - u_opt)), (Uk - u_opt))
+        Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu],
+                                    Uk - u_opt)), (Uk - u_opt))
         
         #State at collocation points
         SumX1 = 0
         Xkj = {}
         for j in range(0,d):
-            Xkj[str(j)] = MX.sym('X_' + str((iter)*nk + k) +'_'+str(j+1), nx)
+            Xkj[str(j)] = MX.sym('X_' + str((iter)*nk + k)
+                                 +'_'+str(j+1), nx)
             w = vertcat(w, Xkj[str(j)])
             lbw = append(lbw, x_min)
             ubw = append(ubw, x_max)
@@ -109,18 +111,11 @@ def itPredHorizon(Xk, w, w0, lbw, ubw, lbg, ubg, g, J, params, iter, count, ssof
         lbg = append(lbg, zeros((nx,1)))
         ubg = append(ubg, zeros((nx,1)))
         
-        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] - pD*Uk[3]) * delta_t
-        Jstate = mtimes(transpose(multiply(Qmax[0:nx],(Xk -xdot_val_rf_ss))),
-                        (Xk - xdot_val_rf_ss))*delta_t
-            
-        #Compute rotated cost function
-        fm = f(Xk, Uk)
-                        
-        #Load Lagrange multipliers from steady-state optimization
-#        data = spio.loadmat('LamdaCstrDist.mat', squeeze_me = True)
-#        lam = data['lamda']
-#        Jmodel = lam*fm
-                        
+        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4]
+                 - pD*Uk[3]) * delta_t
+        Jstate = mtimes(transpose(multiply(Qmax[0:nx],
+                (Xk -xdot_val_rf_ss))),(Xk - xdot_val_rf_ss))*delta_t
+
         J = J + alpha*Jcontrol + gamma*Jstate + beta*Jecon
     
     return J, g, w0, w, lbg, ubg, lbw, ubw, Xk, params, count, ssoftc

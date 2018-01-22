@@ -57,7 +57,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         x0_measure = x0 + measure_noise   #Add measmt noise to states
 
         #Solving NLP
-        primalNLP,_,lb,ub,_,params,_=solveOpt(optProblem,x0,
+        primalNLP,_,lb,ub,_,params,_ =solveOpt(optProblem,x0,
                                             u0,N,x0_measure,params)
 
         #Re-arrange NLP solutions
@@ -128,4 +128,4 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
 
     savemat('iNMPC.mat',ideal)               #saving iNMPC results
 
-    return Tall,xmeasureAll,uAll,ObjVal,primalNLP,params,runtime
+    return Tall, xmeasureAll, uAll, ObjVal, primalNLP, params, runtime, w

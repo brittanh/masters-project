@@ -11,7 +11,7 @@ from casadi import *
 from qp_solve import *
 from numpy import zeros, shape
 
-def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_init, ub_init, verbose_level, N):
+def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_init, ub_init, verbose_level, N, w):
     
     p = p_init
     pp = SX.sym('pp')
@@ -33,7 +33,7 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
         #Calculating the step
         tk = t + delta_t
         p_t = (1-tk)*p_0 +tk*p_final
-        step = p_t + p_init
+        step = p_t - p_init
         
         #Updating bound constraints
         if lb_init.any():
@@ -44,10 +44,11 @@ def predictor_corrector(problem, p_init, p_final, x_init, y_init, delta_t, lb_in
             ub = array([])
 
         #Solve QP problem
-        y, qp_val, qp_exit, lam_qpopt, mu_qpopt, qptime = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init)
+        y, qp_val, qp_exit, lam_qpopt, mu_qpopt, qptime = qp_solve(prob, p, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init, w)
         elapsedqp += qptime
-        raw_input()
+
         if qp_exit == 'infeasible':#QP infeasible
+            print "QP is infeasbile"
             delta_t = alpha_1*t                                   #shorten step
             t = t - delta_t
             #Print out iteration number and failure

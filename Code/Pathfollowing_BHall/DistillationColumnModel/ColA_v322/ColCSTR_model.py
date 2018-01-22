@@ -16,51 +16,51 @@ from numpy import array, Infinity
 def ColCSTR_model(U,params):
 
     #Unpacking model parameters
-    #==================Column Dependent Properties============================#
-    NC = params['dist']['NC']                             #Number of components
-    NF = params['dist']['NF']                         #Stage number feed enters
-    NT = params['dist']['NT']                      #Number of stages in column
-    qF = params['dist']['qF']                             #Feed liquid fraction
-    alpha = params['dist']['alpha']                        #Relative volatility
-    zF0 = params['dist']['zF']       #Feed composition to CSTR [mole fraction]
-    Muw = params['dist']['Muw']                                 #Nominal holdup
-    F_0 = U                                  #Feed flow rate to CSTR [kmol/min]
+    #===============Column Dependent Properties================#
+    NC = params['dist']['NC']
+    NF = params['dist']['NF']
+    NT = params['dist']['NT']
+    qF = params['dist']['qF']
+    alpha = params['dist']['alpha']
+    zF0 = params['dist']['zF']
+    Muw = params['dist']['Muw']
+    F_0 = U
     
     #Data for linearized Liquid flow dynamics
     #(does not apply to reboiler and condenser)
-    taul = params['dist']['taul']      #Time constant for liquid dynamics [min]
-    F0 = params['dist']['F0']                     #Nominal feed rate [kmol/min]
-    qF0 = params['dist']['qF0']             #Nominal fraction of liquid in feed
-    L0 = params['dist']['L0']     #Nominal reflux flow (from steady-state data)
-    L0b = L0 + qF0*F0                #Nominal liquid flow below feed [kmol/min]
-    lam = params['dist']['lam']#Effect of vapor flow on liquid flow (K2 effect)
-    V0 = params['dist']['V0']                                   #Nominal boilup
-    V0t = V0 + (1-qF0)*F0                                  #Nominal vapor flows
+    taul = params['dist']['taul']
+    F0 = params['dist']['F0']
+    qF0 = params['dist']['qF0']
+    L0 = params['dist']['L0']
+    L0b = L0 + qF0*F0
+    lam = params['dist']['lam']
+    V0 = params['dist']['V0']
+    V0t = V0 + (1-qF0)*F0
     
-    #=========================================================================#
+    #==========================================================#
     
     #States and Control Inputs
-    x = SX.sym('x', NT+1, NC-1)                                    #Composition
-    M = SX.sym('M',NT+1, 1)                                             #Holdup
+    x = SX.sym('x', NT+1, NC-1)                     #Composition
+    M = SX.sym('M',NT+1, 1)                              #Holdup
     states = vertcat(x, M)
-    L_T = SX.sym('L_T')                                            #Liquid flow
-    V_B = SX.sym('V_B')                                             #Vapor flow
-    F = SX.sym('F')                                             #Feed to column
-    D = SX.sym('D')                                                 #Distillate
-    B = SX.sym('B')                                                     #Bottom
+    L_T = SX.sym('L_T')                             #Liquid flow
+    V_B = SX.sym('V_B')                              #Vapor flow
+    F = SX.sym('F')                              #Feed to column
+    D = SX.sym('D')                                  #Distillate
+    B = SX.sym('B')                                      #Bottom
     inputs = vertcat(L_T,V_B)
     inputs = vertcat(inputs,F)
     inputs = vertcat(inputs,D)
     inputs = vertcat(inputs,B)
 
-    t = SX.sym('t')                                                       #Time
-    y = SX.sym('y', NT-1, NC-1)                              #Vapor composition
-    Li = SX.sym('Li', NT, 1)                             #Liquid flow on stages
-    Vi = SX.sym('Vi', NT, 1)                              #Vapor flow on stages
+    t = SX.sym('t')                                         #Time
+    y = SX.sym('y', NT-1, NC-1)                #Vapor composition
+    Li = SX.sym('Li', NT, 1)               #Liquid flow on stages
+    Vi = SX.sym('Vi', NT, 1)                #Vapor flow on stages
 
-    dMdt = SX.sym('dMdt', NT+1, 1)                          #Total Molar holdup
-    dMxdt = SX.sym('dMxdt', NT+1, NC-1)                  #Component wise holdup
-    dxdt = SX.sym('dxdt', NT+1, NC-1)            #Rate of change of composition
+    dMdt = SX.sym('dMdt', NT+1, 1)            #Total Molar holdup
+    dMxdt = SX.sym('dMxdt', NT+1, NC-1)    #Component wise holdup
+    dxdt = SX.sym('dxdt', NT+1, NC-1)     #Rate of change of comp
 
     #Vapor flows (assumed constant, no dynamics)
     for i in range(1,NT):
@@ -103,13 +103,13 @@ def ColCSTR_model(U,params):
     #Total Condenser
     dMdt[NT-1] = Vi[NT-2] - Li[NT-1] - D
     for j in range(0,NC-1):
-        dMxdt[NT-1,j] = Vi[NT-2]*y[NT-2,j] - Li[NT-1]*x[NT-1,j] - D*x[NT-1,j]
+        dMxdt[NT-1,j] = Vi[NT-2]*y[NT-2,j] - Li[NT-1]*x[NT-1,j]- D*x[NT-1,j]
 
     #CSTR Model
-    k1 = params['cstr']['k1']                           #Reaction rate constant
+    k1 = params['cstr']['k1']                          
     dMdt[NT] = F_0 + D - F
     for j in range(0,NC-1):
-        dMxdt[NT,j] = F_0*zF0[j] + D*x[NT-1,j] - F*x[NT,j] - k1*M[NT]*x[NT,j]
+        dMxdt[NT,j] = F_0*zF0[j] + D*x[NT-1,j] - F*x[NT,j]- k1*M[NT]*x[NT,j]
 
     for i in range(0, NT+1):
         for j in range(0, NC-1):

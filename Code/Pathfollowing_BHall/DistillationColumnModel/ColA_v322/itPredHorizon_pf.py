@@ -43,13 +43,15 @@ def itPredHorizon_pf(Xk, V, cons, obj, params, iter, ssoftc):
         #New NLP variable for control
         Uk = MX.sym('U_'+str((iter)*nk+k), nu)
         V = vertcat(V,Uk)
-        Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu], Uk - u_opt)), (Uk - u_opt))
+        Jcontrol = mtimes(transpose(multiply(Qmax[nx:nx+nu],
+                                Uk - u_opt)), (Uk - u_opt))
 
         #State at collocation points
         SumX1 = 0
         Xkj = {}
         for j in range(0,d):
-            Xkj[str(j)] = MX.sym('X_' + str((iter)*nk + k) +'_'+str(j+1), nx)
+            Xkj[str(j)] = MX.sym('X_' + str((iter)*nk + k)
+                                 +'_'+str(j+1), nx)
             V = vertcat(V,Xkj[str(j)])
             count += 1
 
@@ -72,9 +74,10 @@ def itPredHorizon_pf(Xk, V, cons, obj, params, iter, ssoftc):
         #Add equality constraint
         cons = vertcat(cons, Xk_end-Xk)
 
-        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] - pD*Uk[3])*delta_t
-        Jstate =  mtimes(transpose(multiply(Qmax[0:nx],(Xk -xdot_val_rf_ss))),
-                 (Xk - xdot_val_rf_ss))*delta_t
+        Jecon = (pf*F_0 + pV*Uk[1] - pB*Uk[4] -
+                    pD*Uk[3])*delta_t
+        Jstate =  mtimes(transpose(multiply(Qmax[0:nx],
+                (Xk -xdot_val_rf_ss))),(Xk - xdot_val_rf_ss))*delta_t
 
         #Compute rotate cost function
         fm = sf(Xk, Uk)
