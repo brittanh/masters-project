@@ -127,7 +127,8 @@ def pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     xmeasureAll = reshape(xmeasureAll,(xmeasureAll.shape[0],1))
     xmeasureAll = reshape(xmeasureAll, (2*NT+2, MPCit))
     xmeasureAll = array(xmeasureAll)
-
+    runtime_pf = sum(runtime_pf)/60.0
+    
     ObjReg = array(ObjVal['reg'])
     ObjEcon = array(ObjVal['econ'])
 

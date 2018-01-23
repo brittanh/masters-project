@@ -13,9 +13,11 @@ To use the code the following elements are required to be installed:
 * Python 2.7
 * [Numpy](http://www.numpy.org/)
 * [Casadi](https://github.com/casadi/casadi/wiki) (version v3.2.0)
+* [OSQP](https://osqp.readthedocs.io/en/latest/index.html) (version v0.2.1)
 
 ## Purpose
-This code implements economic NMPC using a path-following algorithm.
+This code implements economic NMPC solving both the full NMPC problem and an alternative method that uses a path-following algorithm.
+
 ## Getting Started
 The scripts work as follows:
 

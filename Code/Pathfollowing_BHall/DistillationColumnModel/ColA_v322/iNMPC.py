@@ -12,6 +12,7 @@ from compObjFn import *
 from solveOpt import *
 from plotStates import *
 from scipy.io import savemat, loadmat
+import time
 
 def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     
@@ -34,7 +35,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
 
     #NMPC iteration
     iter = 1
-
+    
     #Load in noise data
     data = loadmat('noise1pct.mat', squeeze_me = True)
     noise = data['noise']
@@ -57,9 +58,10 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         x0_measure = x0 + measure_noise#Add measmt noise to states
 
         #Solving NLP
-        primalNLP,_,lb,ub,_,params,_=solveOpt(optProblem,x0,
-                                            u0,N,x0_measure,params)
-
+        startnlp = time.time()
+        primalNLP,_,lb,ub,_,params,_ = solveOpt(optProblem, x0, u0, N, x0_measure, params)
+        elapsedtime = time.time()-startnlp
+        
         #Re-arrange NLP solutions
         #(turning vectors into matrices to make easier to plot)
         u_nlp_opt, x_nlp_opt = plotStates(primalNLP, lb, ub, N, params)
@@ -87,7 +89,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
         #Apply control to process with optimized
         #control from path-following algorithm
         x0 = xmeasure                        #From online step
-        tmeasure,xmeasure=applyControl(system,T,t0,x0,u_nlp_opt)
+        tmeasure,xmeasure = applyControl(system,T,t0,x0,u_nlp_opt)
 
         #Using actual state
         Jobj = compObjFn(u_nlp_opt[:,0], xmeasure)
@@ -111,6 +113,7 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
     xmeasureAll = reshape(xmeasureAll,(xmeasureAll.shape[0],1))
     xmeasureAll = reshape(xmeasureAll, (2*NT+2, MPCit))
     xmeasureAll = array(xmeasureAll)
+    runtime_nlp = sum(runtime)/60.0
 
     ObjReg = array(ObjVal['reg'])
     ObjEcon = array(ObjVal['econ'])
@@ -122,10 +125,11 @@ def iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params):
                 'ObjReg': ObjReg,
                 'ObjEcon': ObjEcon,
                 'T': T,
-                'mpciterations': MPCit
+                'mpciterations': MPCit,
+                'runtime': runtime_nlp
                 }
     }
 
-    savemat('iNMPC.mat',ideal)            #saving iNMPC results
+    savemat('iNMPC_Python.mat',ideal)            #saving iNMPC results
 
-    return Tall, xmeasureAll, uAll, ObjVal,primalNLP,params,runtime
+    return Tall, xmeasureAll, uAll, ObjVal, primalNLP, params, runtime_nlp

@@ -16,6 +16,7 @@ from pfNMPC import *
 from iNMPC import *
 from params import *
 from plotting import *
+import time
 
 #MPC iterations
 MPCit = 150
@@ -36,14 +37,16 @@ Uf = 0.3                                    #Feed rate to CSTR (F_0)
 params['dist']['F_0'] = Uf
 
 #Applying ideal NMPC
+#startnlp = time.time()
 #_, xmeasureAll, uAll,_, _, _, runtime = iNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params)
-
-#print "iNMPC finished \n"
+#endnlp = time.time()- startnlp
+#print "iNMPC finished in %f \n seconds" %endnlp
 
 #Applying path-following NMPC
+#startpf = time.time()
 #_, xmeasureAll_pf, uAll_pf, _, _, _, runtime_pf = pfNMPC(optProblem, system, MPCit, N, T, tmeasure, xmeasure, u0, params)
-
-#print "pfNMPC finished \n"
+#endpf = time.time()-startpf
+#print "pfNMPC finished in %f\n seconds" %endpf
 
 #Plotting results
 plotting(u0, xmeasure, MPCit, T)

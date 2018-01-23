@@ -102,7 +102,6 @@ def qp_solve(prob, p_init, x_init, y_init, step, lb, ub, N, x0, lb_init, ub_init
     qp_val = results.info.obj_val
     elapsedqp = results.info.solve_time
 
-
     ##===============Solving QP using QPOASES/GUROBI========================##
 #    qp = {}
 #    qp['h'] = H.sparsity()
